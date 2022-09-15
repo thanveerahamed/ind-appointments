@@ -26,9 +26,10 @@ const initialFilterState: Filter = {
 
 interface Props {
   onSearch: (filter: Filter) => void;
+  onReset: () => void;
 }
 
-const FilterSection = ({ onSearch }: Props) => {
+const FilterSection = ({ onSearch, onReset }: Props) => {
   const [filters, setFilters] = useState<Filter>(initialFilterState);
 
   const handleAppointmentTypeChange = (
@@ -63,6 +64,11 @@ const FilterSection = ({ onSearch }: Props) => {
       people: event.target.value,
     });
   };
+
+  const handleOnResetClick = () => {
+    setFilters(initialFilterState);
+    onReset();
+  }
 
   return (
     <Card sx={{ minWidth: 275 }}>
@@ -133,7 +139,8 @@ const FilterSection = ({ onSearch }: Props) => {
         </Grid>
       </CardContent>
       <CardActions>
-        <Button onClick={() => onSearch(filters)}>Search</Button>
+        <Button onClick={() => onSearch(filters)} color="success" variant="contained">Search</Button>
+        <Button onClick={handleOnResetClick} color="error" variant="outlined">Reset</Button>
       </CardActions>
     </Card>
   );
