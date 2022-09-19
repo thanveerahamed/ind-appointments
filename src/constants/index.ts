@@ -1,15 +1,10 @@
 import {ValueLabelPair} from "../types";
 
-export const APPOINTMENT_DESKS: ValueLabelPair[] = [
-    {
-        value: "AM",
-        label: "Amsterdam"
-    },
-    {
-        value: "DH",
-        label: "Den Haag"
-    }
-]
+export enum ALERT_SEVERITY{
+    INFO = 'info',
+    ERROR= 'error',
+    WARNING = 'warning'
+}
 
 export const APPOINTMENT_TYPES: ValueLabelPair[] = [
     {
