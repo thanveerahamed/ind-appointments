@@ -13,51 +13,47 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import AddIcon from "@mui/icons-material/Add";
 import { APPOINTMENT_TYPES } from "../../../constants";
 import { Desk, Filters } from "../../../types";
-import { dayjs } from "../../../types/dayjs";
+import { dayjs, Dayjs } from "../../../types/dayjs";
+import {
+  changeAppointmentType,
+  changeDates,
+  changeLocations,
+  changeNumberOfPeople,
+} from "../../../store/reducers/filters";
+import { RootState, useAppDispatch } from "../../../store/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   filters: Filters;
-  desks: Desk[];
   onSearch: () => void;
   onReset: () => void;
-  onAddInformation: () => void;
-  onFilterChange: (filter: Filters) => void;
 }
 
-const FilterSection = ({
-  filters,
-  onSearch,
-  onReset,
-  onFilterChange,
-  onAddInformation,
-  desks,
-}: Props) => {
+const FilterSection = ({ filters, onSearch, onReset }: Props) => {
+  const dispatch = useAppDispatch();
+  const { availableDesks: desks } = useSelector(
+    (state: RootState) => state.desks
+  );
+
   const handleAppointmentTypeChange = (event: SelectChangeEvent) => {
-    onFilterChange({
-      ...filters,
-      appointmentType: event.target.value,
-    });
+    dispatch(changeAppointmentType(event.target.value));
   };
 
   const handleDeskChange = (newValue: Desk[]) => {
-    if (newValue.length > 5) {
-      return;
-    }
-
-    onFilterChange({
-      ...filters,
-      locations: newValue,
-    });
+    dispatch(changeLocations(newValue));
   };
 
   const handlePeopleChange = (event: SelectChangeEvent) => {
-    onFilterChange({
-      ...filters,
-      people: event.target.value,
-    });
+    dispatch(changeNumberOfPeople(event.target.value));
+  };
+
+  const handleDateChange = (
+    key: "startDate" | "endDate",
+    date: Dayjs | null
+  ) => {
+    dispatch(changeDates({ key, value: date }));
   };
 
   const handleOnResetClick = () => {
@@ -113,11 +109,7 @@ const FilterSection = ({
                   value={filters.startDate}
                   inputFormat={"DD-MM-YYYY"}
                   onChange={(newValue) => {
-                    debugger;
-                    onFilterChange({
-                      ...filters,
-                      startDate: newValue,
-                    });
+                    handleDateChange("startDate", newValue);
                   }}
                   minDate={dayjs()}
                   renderInput={(params) => (
@@ -138,10 +130,7 @@ const FilterSection = ({
                   inputFormat={"DD-MM-YYYY"}
                   value={filters.endDate}
                   onChange={(newValue) => {
-                    onFilterChange({
-                      ...filters,
-                      endDate: newValue,
-                    });
+                    handleDateChange("endDate", newValue);
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -204,17 +193,7 @@ const FilterSection = ({
                 variant="outlined"
                 sx={{ marginLeft: "5px" }}
               >
-                Reset
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                onClick={onAddInformation}
-                color="secondary"
-                variant="contained"
-                startIcon={<AddIcon />}
-              >
-                Add information
+                Clear table
               </Button>
             </Grid>
           </Grid>

@@ -16,3 +16,7 @@ export const APPOINTMENT_TYPES: ValueLabelPair[] = [
         label: "Document collection"
     }
 ]
+
+// eslint-disable-next-line no-useless-escape
+export const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+export const PHONE_NUMBER_REGEX = /^[0-9]{10}$/g;

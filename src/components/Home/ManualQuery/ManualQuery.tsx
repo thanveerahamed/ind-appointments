@@ -1,87 +1,47 @@
 import FilterSection from "../FilterSection/FilterSection";
-import {
-  AvailableSlotsWithLocation,
-  Desk,
-  Filters,
-  Person,
-} from "../../../types";
-import { getAvailableDesks, getAvailableSlots } from "../../../data";
+import { AvailableSlotsWithLocation } from "../../../types";
+import { getAvailableSlotsWithDesk } from "../../../data";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SlotsDisplay from "../SlotsDisplay/SlotsDisplay";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
-import { dayjs } from "../../../types/dayjs";
 import { Box, Grid } from "@mui/material";
 import { ALERT_SEVERITY } from "../../../constants";
-import { Dayjs } from "dayjs";
 import BookingInformation from "../BookingInformation/BookingInformation";
+import InformationDisplay from "../InformationDisplay/InformationDisplay";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "../../../store/store";
+import SelectedSlotView from "../SelectedSlotView/SelectedSlotView";
+import {
+  updateAvailableSlotsWithLocation,
+  updateAvailableSlotsWithLocationToEmpty,
+} from "../../../store/reducers/slots";
 
-const initialFilterState: Filters = {
-  appointmentType: "BIO",
-  people: "1",
-  locations: [],
-  startDate: dayjs(),
-  endDate: dayjs().add(3, "month"),
-};
+interface Props{
+  loading: boolean;
+  setLoading: (flag: boolean) => void
+}
 
-const ManualQuery = () => {
-  const [availableSlots, setAvailableSlots] = useState<
-    AvailableSlotsWithLocation[]
-  >([]);
+const ManualQuery = ({loading, setLoading}: Props) => {
+  const dispatch = useAppDispatch();
+  const { filters } = useSelector((state: RootState) => state);
   const [alertSeverity, setAlertSeverity] = useState<ALERT_SEVERITY>(
     ALERT_SEVERITY.ERROR
   );
   const [alertMessage, setAlertMessage] = useState<string | undefined>(
     undefined
   );
-  const [selectedAppointmentIds, setSelectedAppointmentIds] = useState<
-    string[]
-  >([]);
-  const [filters, setFilters] = useState<Filters>(initialFilterState);
-  const [desks, setDesks] = useState<Desk[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+
+
   const [showBookingInformationScreen, setShowBookingInformationScreen] =
     useState<boolean>(false);
-  const [peopleInformation, setPeopleInformation] = useState<Person[]>([
-    {
-      bsn: "",
-      firstName: "",
-      lastName: "",
-      vNumber: "",
-    },
-  ]);
 
-  const handlePeopleChange = (newFilterValue: Filters) => {
-    const countNew = parseInt(newFilterValue.people, 10);
-    const countOld = parseInt(filters.people, 10);
-    const data = [...peopleInformation];
-    if (countNew > countOld) {
-      const incrementBy = countNew - countOld;
-      for (let i = 1; i <= incrementBy; i++) {
-        data.push({
-          bsn: "",
-          firstName: "",
-          lastName: "",
-          vNumber: "",
-        });
-      }
-    } else {
-      const decrementBy = countOld - countNew;
-      data.splice(peopleInformation.length - decrementBy, decrementBy);
-    }
-
-    setPeopleInformation(data);
-  };
-
-  const handleFilterChange = async (newFilters: Filters) => {
-    setAvailableSlots([]);
-    setFilters(newFilters);
-    if (parseInt(newFilters.people, 10) !== parseInt(filters.people, 10)) {
-      handlePeopleChange(newFilters);
-    }
-  };
+  const dispatchAvailableSlotUpdate = (slots: AvailableSlotsWithLocation[]) =>
+    dispatch(updateAvailableSlotsWithLocation(slots));
+  const dispatchSetAvailableSlotToEmpty = () =>
+    dispatch(updateAvailableSlotsWithLocationToEmpty());
 
   const handleOnSearch = async () => {
     if (
@@ -95,31 +55,9 @@ const ManualQuery = () => {
     setLoading(true);
     setAlertMessage(undefined);
 
-    const promises = filters.locations.map(
-      async (location): Promise<AvailableSlotsWithLocation> => {
-        return {
-          deskKey: location.key,
-          deskName: (desks.find((desk) => desk.key === location.key) as Desk)
-            .name,
-          slots: (
-            await getAvailableSlots({
-              location: location.key,
-              appointmentType: filters.appointmentType,
-              people: filters.people,
-            })
-          ).filter((slot): boolean =>
-            dayjs(slot.date, "YYYY-MM-DD").isBetween(
-              (filters.startDate as Dayjs).format("YYYY-MM-DD"),
-              (filters.endDate as Dayjs).format("YYYY-MM-DD")
-            )
-          ),
-        };
-      }
-    );
-
     try {
-      const availableSlotsWithDesk = await Promise.all(promises);
-      setAvailableSlots(availableSlotsWithDesk);
+      const availableSlotsWithDesk = await getAvailableSlotsWithDesk(filters);
+      dispatchAvailableSlotUpdate(availableSlotsWithDesk);
       const totalNumberOfSlots = availableSlotsWithDesk.reduce(
         (total, value) => {
           return total + value.slots.length;
@@ -141,33 +79,12 @@ const ManualQuery = () => {
   };
 
   const handleFilterResetClick = () => {
-    setAvailableSlots([]);
+    dispatchSetAvailableSlotToEmpty();
   };
 
-  const handleOnAppointmentSlotSelected = (appointmentIds: string[]) => {
-    setSelectedAppointmentIds(appointmentIds);
-  };
 
-  const getDesks = async () => {
-    const availableDesks = await getAvailableDesks({
-      appointmentType: filters.appointmentType,
-    });
-    setDesks(availableDesks);
-    return availableDesks;
-  };
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const desks = await getDesks();
-      setFilters({
-        ...filters,
-        locations: desks.length > 0 ? [desks[0]] : [],
-      });
-      setLoading(false);
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.appointmentType]);
+
 
   return (
     <>
@@ -197,25 +114,18 @@ const ManualQuery = () => {
           <FilterSection
             onSearch={handleOnSearch}
             onReset={handleFilterResetClick}
-            onFilterChange={handleFilterChange}
-            onAddInformation={() => setShowBookingInformationScreen(true)}
             filters={filters}
-            desks={desks}
           ></FilterSection>
+          <InformationDisplay
+            onAddInformation={() => setShowBookingInformationScreen(true)}
+          />
         </Grid>
         <Grid item xs={12} md={8}>
-          <SlotsDisplay
-            availableSlots={availableSlots}
-            selectedAppointments={selectedAppointmentIds}
-            desks={desks}
-            onAppointmentSelected={handleOnAppointmentSlotSelected}
-          ></SlotsDisplay>
+          <SelectedSlotView />
+          <SlotsDisplay />
         </Grid>
         {showBookingInformationScreen && (
           <BookingInformation
-            totalPersons={parseInt(filters.people, 10)}
-            persons={peopleInformation}
-            contactDetails={{ email: "", phone: "" }}
             open={showBookingInformationScreen}
             onClose={() => setShowBookingInformationScreen(false)}
           ></BookingInformation>
