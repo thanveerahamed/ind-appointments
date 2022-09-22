@@ -93,7 +93,6 @@ const ManualQuery = ({ loading, setLoading }: Props) => {
           <FilterSection
             onSearch={handleOnSearch}
             onReset={handleFilterResetClick}
-            filters={filters}
           ></FilterSection>
           <InformationDisplay
             onAddInformation={() => setShowBookingInformationScreen(true)}

@@ -14,7 +14,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { APPOINTMENT_TYPES } from "../../../constants";
-import { Desk, Filters } from "../../../types";
+import { Desk } from "../../../types";
 import { dayjs, Dayjs } from "../../../types/dayjs";
 import {
   changeAppointmentType,
@@ -26,16 +26,17 @@ import { RootState, useAppDispatch } from "../../../store/store";
 import { useSelector } from "react-redux";
 
 interface Props {
-  filters: Filters;
-  onSearch: () => void;
-  onReset: () => void;
+  showActions?: boolean;
+  onSearch?: () => void;
+  onReset?: () => void;
 }
 
-const FilterSection = ({ filters, onSearch, onReset }: Props) => {
+const FilterSection = ({ showActions = true, onSearch, onReset }: Props) => {
   const dispatch = useAppDispatch();
   const { availableDesks: desks } = useSelector(
     (state: RootState) => state.desks
   );
+  const { filters } = useSelector((state: RootState) => state);
 
   const handleAppointmentTypeChange = (event: SelectChangeEvent) => {
     dispatch(changeAppointmentType(event.target.value));
@@ -57,7 +58,9 @@ const FilterSection = ({ filters, onSearch, onReset }: Props) => {
   };
 
   const handleOnResetClick = () => {
-    onReset();
+    if(onReset !== undefined){
+      onReset();
+    }
   };
 
   return (
@@ -128,6 +131,7 @@ const FilterSection = ({ filters, onSearch, onReset }: Props) => {
                 <DatePicker
                   label="End date"
                   inputFormat={"DD-MM-YYYY"}
+                  minDate={filters.startDate?.add(1, "day")}
                   value={filters.endDate}
                   onChange={(newValue) => {
                     handleDateChange("endDate", newValue);
@@ -177,27 +181,33 @@ const FilterSection = ({ filters, onSearch, onReset }: Props) => {
             </Grid>
           </Grid>
         </CardContent>
-        <CardActions>
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
-              <Button
-                onClick={() => onSearch()}
-                color="success"
-                variant="contained"
-              >
-                Search
-              </Button>
-              <Button
-                onClick={handleOnResetClick}
-                color="error"
-                variant="outlined"
-                sx={{ marginLeft: "5px" }}
-              >
-                Clear table
-              </Button>
+        {showActions && (
+          <CardActions>
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <Button
+                  onClick={() => {
+                    if (onSearch !== undefined) {
+                      onSearch();
+                    }
+                  }}
+                  color="success"
+                  variant="contained"
+                >
+                  Search
+                </Button>
+                <Button
+                  onClick={handleOnResetClick}
+                  color="error"
+                  variant="outlined"
+                  sx={{ marginLeft: "5px" }}
+                >
+                  Clear table
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </CardActions>
+          </CardActions>
+        )}
       </Card>
     </>
   );

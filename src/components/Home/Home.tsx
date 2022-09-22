@@ -12,6 +12,7 @@ import { getAvailableDesks } from "../../data";
 import { updateDesks } from "../../store/reducers/desks";
 import { updateAvailableSlotsWithLocationToEmpty } from "../../store/reducers/slots";
 import SnackBarAlert from "../common/SnackBarAlert/SnackBarAlert";
+import TimerQuery from "./TimeQuery/TimerQuery";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -99,7 +100,7 @@ const Home = () => {
         <ManualQuery loading={loading} setLoading={setLoading}></ManualQuery>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        <TimerQuery />
       </TabPanel>
       <SnackBarAlert />
     </Box>
