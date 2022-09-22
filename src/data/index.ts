@@ -1,8 +1,28 @@
-import {AvailableSlotsWithLocation, Desk, Filters, Slot} from "../types";
+import {
+  AvailableSlotsWithLocation,
+  BookAppointmentResponse,
+  ContactDetails,
+  Desk,
+  ErrorList,
+  Filters,
+  Person,
+  Slot,
+  SlotWithId,
+} from "../types";
 import { dayjs } from "../types/dayjs";
 import { Dayjs } from "dayjs";
+import { makeBookAppointmentRequest } from "../helpers/request";
 
 const url = "https://ind-api.000webhostapp.com/ind-service/index.php";
+
+const handleError = async (response: Response) => {
+  const errorResponse = await response.json();
+  if (errorResponse.data !== undefined) {
+    throw Error(errorResponse.data);
+  } else {
+    throw Error(ErrorList.GENERAL);
+  }
+};
 
 export const getAvailableDesks = async ({
   appointmentType,
@@ -18,6 +38,10 @@ export const getAvailableDesks = async ({
       },
     }),
   }).then(async (response) => {
+    if (response.status !== 200) {
+      await handleError(response);
+    }
+
     return (await response.json()).data;
   });
 };
@@ -42,11 +66,15 @@ export const getAvailableSlots = async ({
       },
     }),
   }).then(async (response) => {
+    if (response.status !== 200) {
+      await handleError(response);
+    }
+
     return (await response.json()).data;
   });
 };
 
-export const  getAvailableSlotsWithDesk = async (
+export const getAvailableSlotsWithDesk = async (
   filters: Filters
 ): Promise<AvailableSlotsWithLocation[]> => {
   const promises = filters.locations.map(
@@ -71,4 +99,63 @@ export const  getAvailableSlotsWithDesk = async (
   );
 
   return Promise.all(promises);
+};
+
+export const blockSelectedSlot = async ({
+  slotWithId,
+}: {
+  slotWithId: SlotWithId;
+}): Promise<Slot[]> => {
+  return await fetch(url, {
+    method: "post",
+    body: JSON.stringify({
+      action: "blockSlot",
+      data: {
+        desk: slotWithId.deskKey,
+        payload: slotWithId as Slot,
+      },
+    }),
+  }).then(async (response) => {
+    if (response.status !== 200) {
+      await handleError(response);
+    }
+
+    return (await response.json()).data;
+  });
+};
+
+export const bookAppointment = async ({
+  slotWithId,
+  contactInformation,
+  persons,
+  appointmentType,
+}: {
+  slotWithId: SlotWithId;
+  contactInformation: ContactDetails;
+  persons: Person[];
+  appointmentType: string;
+}): Promise<BookAppointmentResponse> => {
+  const payload = makeBookAppointmentRequest(
+    slotWithId,
+    persons,
+    contactInformation,
+    appointmentType
+  );
+  console.log(JSON.stringify(payload));
+  return await fetch(url, {
+    method: "post",
+    body: JSON.stringify({
+      action: "reserveSlot",
+      data: {
+        desk: slotWithId.deskKey,
+        payload,
+      },
+    }),
+  }).then(async (response) => {
+    if (response.status !== 200) {
+      await handleError(response);
+    }
+
+    return (await response.json()).data;
+  });
 };

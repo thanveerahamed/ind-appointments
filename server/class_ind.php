@@ -142,8 +142,6 @@ class Ind{
         $err = curl_error($ch);
         curl_close($ch);
 
-        echo $result;
-
         $response = array();
 
         if($err){

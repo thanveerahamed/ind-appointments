@@ -1,4 +1,4 @@
-import { Dayjs } from './dayjs';
+import { Dayjs } from "./dayjs";
 
 export interface Filters {
   appointmentType: string;
@@ -46,7 +46,49 @@ export interface Person {
   lastName: string;
 }
 
+export interface ResponsePerson extends Person{
+  vnumber: string;
+  fullName: string;
+}
+
 export interface ContactDetails {
   email: string;
   phone: string;
+}
+
+export enum ErrorList {
+  GENERAL = "GENERAL",
+  APT_TAKEN = "APT_TAKEN",
+}
+
+export interface BookableSlot extends Slot {
+  booked: boolean;
+}
+
+export interface Appointment extends Omit<Slot, "key"> {
+  productKey: string;
+  phone: string;
+  email: string;
+  language: string;
+  customers: Person[];
+}
+
+export interface BookAppointmentRequest {
+  bookableSlot: BookableSlot;
+  appointment: Appointment;
+}
+
+export interface BookAppointmentResponse extends Omit<Slot, 'parts'>{
+  version: number;
+  code: string;
+  productKey: string;
+  email: string;
+  hasEmail: boolean;
+  phone: string;
+  language: string;
+  status?: any;
+  hasDetail: boolean;
+  customers: ResponsePerson[];
+  birthDate?: any;
+  user?: any;
 }

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if($action === "reserveSlot"){
-        echo json_encode($classInd->BlockIndSlot($data));
+        echo json_encode($classInd->ReserveIndSlot($data));
     }
 
 } else {

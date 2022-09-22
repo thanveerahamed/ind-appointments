@@ -4,11 +4,9 @@ import { getAvailableSlotsWithDesk } from "../../../data";
 import * as React from "react";
 import { useState } from "react";
 import SlotsDisplay from "../SlotsDisplay/SlotsDisplay";
-import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
-import { Box, Grid } from "@mui/material";
-import { ALERT_SEVERITY } from "../../../constants";
+import { Grid } from "@mui/material";
 import BookingInformation from "../BookingInformation/BookingInformation";
 import InformationDisplay from "../InformationDisplay/InformationDisplay";
 import { useSelector } from "react-redux";
@@ -18,22 +16,17 @@ import {
   updateAvailableSlotsWithLocation,
   updateAvailableSlotsWithLocationToEmpty,
 } from "../../../store/reducers/slots";
+import {showSnackbar} from "../../../store/reducers/alerts";
+import BookedAppointmentView from "../BookedAppointmentView/BookedAppointmentView";
 
-interface Props{
+interface Props {
   loading: boolean;
-  setLoading: (flag: boolean) => void
+  setLoading: (flag: boolean) => void;
 }
 
-const ManualQuery = ({loading, setLoading}: Props) => {
+const ManualQuery = ({ loading, setLoading }: Props) => {
   const dispatch = useAppDispatch();
   const { filters } = useSelector((state: RootState) => state);
-  const [alertSeverity, setAlertSeverity] = useState<ALERT_SEVERITY>(
-    ALERT_SEVERITY.ERROR
-  );
-  const [alertMessage, setAlertMessage] = useState<string | undefined>(
-    undefined
-  );
-
 
   const [showBookingInformationScreen, setShowBookingInformationScreen] =
     useState<boolean>(false);
@@ -53,7 +46,6 @@ const ManualQuery = ({loading, setLoading}: Props) => {
     }
 
     setLoading(true);
-    setAlertMessage(undefined);
 
     try {
       const availableSlotsWithDesk = await getAvailableSlotsWithDesk(filters);
@@ -66,14 +58,20 @@ const ManualQuery = ({loading, setLoading}: Props) => {
       );
 
       if (totalNumberOfSlots <= 0) {
-        setAlertSeverity(ALERT_SEVERITY.INFO);
-        setAlertMessage("No slots found for current search criteria");
-      } else {
-        setAlertMessage(undefined);
+        dispatch(
+          showSnackbar({
+            message: "No slots found for current search criteria",
+            severity: "info",
+          })
+        );
       }
     } catch (error: unknown) {
-      setAlertSeverity(ALERT_SEVERITY.ERROR);
-      setAlertMessage("Some unknown error occurred. Please refresh the page");
+      dispatch(
+        showSnackbar({
+          message: "Some unknown error occurred. Please refresh the page",
+          severity: "error",
+        })
+      );
     }
     setLoading(false);
   };
@@ -82,27 +80,8 @@ const ManualQuery = ({loading, setLoading}: Props) => {
     dispatchSetAvailableSlotToEmpty();
   };
 
-
-
-
-
   return (
     <>
-      {alertMessage !== undefined && (
-        <Box
-          sx={{
-            margin: "1% 10%",
-          }}
-        >
-          <Alert
-            severity={alertSeverity}
-            variant="outlined"
-            onClose={() => setAlertMessage(undefined)}
-          >
-            {alertMessage}
-          </Alert>
-        </Box>
-      )}
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loading}
@@ -131,6 +110,7 @@ const ManualQuery = ({loading, setLoading}: Props) => {
           ></BookingInformation>
         )}
       </Grid>
+      <BookedAppointmentView />
     </>
   );
 };

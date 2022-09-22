@@ -4,6 +4,7 @@ import { filtersSlice } from "./reducers/filters";
 import { bookingInformationSlice } from "./reducers/bookingInformation";
 import { slotsSlice } from "./reducers/slots";
 import { desksSlice } from "./reducers/desks";
+import { alertsSlice } from "./reducers/alerts";
 
 const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ const store = configureStore({
     bookingInformation: bookingInformationSlice.reducer,
     slots: slotsSlice.reducer,
     desks: desksSlice.reducer,
+    alerts: alertsSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

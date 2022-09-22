@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AvailableSlotsWithLocation, SlotWithId } from "../../types";
+import {AvailableSlotsWithLocation, BookAppointmentResponse, SlotWithId} from "../../types";
 
 const initialState: {
   selectedSlot?: SlotWithId;
   availableSlots: AvailableSlotsWithLocation[];
+  bookedSlotResponse?: BookAppointmentResponse;
 } = {
   selectedSlot: undefined,
   availableSlots: [],
+  bookedSlotResponse: undefined
 };
 
 export const slotsSlice = createSlice({
@@ -23,10 +25,24 @@ export const slotsSlice = createSlice({
       state.availableSlots = action.payload;
     },
     updateAvailableSlotsWithLocationToEmpty: (state) => {
-      state.availableSlots = []
+      state.availableSlots = [];
+    },
+    updateBookedSlotResponse: (state, action: PayloadAction<BookAppointmentResponse>) => {
+      state.bookedSlotResponse = action.payload;
+    },
+    resetSlots:  (state) => {
+      state.selectedSlot = undefined;
+      state.availableSlots = [];
+      state.bookedSlotResponse = undefined;
     }
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { slotSelected, updateAvailableSlotsWithLocation, updateAvailableSlotsWithLocationToEmpty } = slotsSlice.actions;
+export const {
+  slotSelected,
+  updateAvailableSlotsWithLocation,
+  updateAvailableSlotsWithLocationToEmpty,
+  updateBookedSlotResponse,
+  resetSlots
+} = slotsSlice.actions;

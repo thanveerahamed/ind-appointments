@@ -80,7 +80,7 @@ const SlotsDisplay = () => {
     .sort(sortSlotsAscending);
 
   const handleSelectedRowChange = (rowIds: GridSelectionModel) => {
-    if (rowIds.length >= 2) {
+    if (rowIds.length > 2) {
       return;
     }
 
@@ -88,6 +88,13 @@ const SlotsDisplay = () => {
     if (rowIds.length === 1) {
       slotChecked = data.find(
         (slotWithId) => slotWithId.id === rowIds[0]
+      ) as SlotWithId;
+    }
+
+    if (rowIds.length === 2 && selectedSlot !== undefined) {
+      const currentRowId = rowIds.find((id) => id !== selectedSlot.id);
+      slotChecked = data.find(
+        (slotWithId) => slotWithId.id === currentRowId
       ) as SlotWithId;
     }
 

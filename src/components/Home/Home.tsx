@@ -2,6 +2,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { SyntheticEvent, useEffect, useState } from "react";
+import Fade from "@mui/material/Fade";
 import ManualQuery from "./ManualQuery/ManualQuery";
 import { changeLocations } from "../../store/reducers/filters";
 import { updatePeopleInformationOnNumberOfPeopleChange } from "../../store/reducers/bookingInformation";
@@ -10,6 +11,7 @@ import { useSelector } from "react-redux";
 import { getAvailableDesks } from "../../data";
 import { updateDesks } from "../../store/reducers/desks";
 import { updateAvailableSlotsWithLocationToEmpty } from "../../store/reducers/slots";
+import SnackBarAlert from "../common/SnackBarAlert/SnackBarAlert";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -28,11 +30,11 @@ const TabPanel = (props: TabPanelProps) => {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
+      <Fade in={value === index}>
         <Box>
           <div>{children}</div>
         </Box>
-      )}
+      </Fade>
     </div>
   );
 };
@@ -99,6 +101,7 @@ const Home = () => {
       <TabPanel value={value} index={1}>
         Item Two
       </TabPanel>
+      <SnackBarAlert />
     </Box>
   );
 };
