@@ -13,6 +13,8 @@ import { updateDesks } from "../../store/reducers/desks";
 import { updateAvailableSlotsWithLocationToEmpty } from "../../store/reducers/slots";
 import SnackBarAlert from "../common/SnackBarAlert/SnackBarAlert";
 import TimerQuery from "./TimeQuery/TimerQuery";
+import StopTimeConfirmationDialog from "./TimeQuery/StopTimeConfirmationDialog";
+import {stopTimerAndReset} from "../../store/reducers/timer";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -49,12 +51,33 @@ const a11yProps = (index: number) => {
 
 const Home = () => {
   const dispatch = useAppDispatch();
-  const { filters } = useSelector((state: RootState) => state);
+  const {
+    filters,
+    timer: { activeStep },
+  } = useSelector((state: RootState) => state);
   const [loading, setLoading] = useState<boolean>(true);
   const [value, setValue] = useState(0);
+  const [tempValue, setTempValue] = useState(0);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
+    // if the timer is running only then.
+    if (activeStep === 2) {
+      setShowDialog(true);
+      setTempValue(newValue);
+      return;
+    }
     setValue(newValue);
+  };
+
+  const handleOnClose = (confirm: boolean) => {
+    if (confirm) {
+      dispatch(stopTimerAndReset());
+      setValue(tempValue);
+    }
+
+    setShowDialog(false);
+    setTempValue(0);
   };
 
   const dispatchSetAvailableSlotToEmpty = () =>
@@ -92,8 +115,8 @@ const Home = () => {
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleTabChange} aria-label="query tabs">
-          <Tab label="Manual Query" {...a11yProps(0)} />
-          <Tab label="Timer Query" {...a11yProps(1)} />
+          <Tab label="Search" {...a11yProps(0)} />
+          <Tab label="Scheduler" {...a11yProps(1)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -103,6 +126,7 @@ const Home = () => {
         <TimerQuery />
       </TabPanel>
       <SnackBarAlert />
+      <StopTimeConfirmationDialog open={showDialog} onClose={handleOnClose} />
     </Box>
   );
 };

@@ -7,7 +7,7 @@ import SlotsDisplay from "../SlotsDisplay/SlotsDisplay";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
 import { Grid } from "@mui/material";
-import BookingInformation from "../BookingInformation/BookingInformation";
+import BookingInformationDialog from "../BookingInformation/BookingInformationDialog";
 import InformationDisplay from "../InformationDisplay/InformationDisplay";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../../store/store";
@@ -17,7 +17,8 @@ import {
   updateAvailableSlotsWithLocationToEmpty,
 } from "../../../store/reducers/slots";
 import {showSnackbar} from "../../../store/reducers/alerts";
-import BookedAppointmentView from "../BookedAppointmentView/BookedAppointmentView";
+import BookedAppointmentDialog from "../BookedAppointmentView/BookedAppointmentDialog";
+import {isFiltersValid} from "../../../helpers/validators";
 
 interface Props {
   loading: boolean;
@@ -38,9 +39,7 @@ const ManualQuery = ({ loading, setLoading }: Props) => {
 
   const handleOnSearch = async () => {
     if (
-      filters.locations.length <= 0 ||
-      filters.startDate === null ||
-      filters.endDate === null
+      !isFiltersValid(filters)
     ) {
       return;
     }
@@ -103,13 +102,13 @@ const ManualQuery = ({ loading, setLoading }: Props) => {
           <SlotsDisplay />
         </Grid>
         {showBookingInformationScreen && (
-          <BookingInformation
+          <BookingInformationDialog
             open={showBookingInformationScreen}
             onClose={() => setShowBookingInformationScreen(false)}
-          ></BookingInformation>
+          ></BookingInformationDialog>
         )}
       </Grid>
-      <BookedAppointmentView />
+      <BookedAppointmentDialog />
     </>
   );
 };

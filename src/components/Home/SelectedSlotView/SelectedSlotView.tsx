@@ -43,7 +43,7 @@ const SelectedSlotView = () => {
         dispatch(
           showSnackbar({
             message: getErrorMessage(error.message),
-            severity: "warning",
+            severity: "error",
           })
         );
       }

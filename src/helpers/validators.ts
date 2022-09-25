@@ -1,5 +1,5 @@
 import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from "../constants";
-import { ContactDetails, Person } from "../types";
+import { ContactDetails, Filters, Person } from "../types";
 import store from "../store/store";
 
 const isEmailValid = (email: string) => email.match(EMAIL_REGEX);
@@ -33,4 +33,24 @@ const hasBookingInformation = (): boolean => {
   return isFormValid(contactInformation, peopleInformation);
 };
 
-export { isEmailValid, isPhoneNumberValid, isFormValid, hasBookingInformation };
+const isFiltersValid = (filters?: Filters): boolean => {
+  let currentFilters = filters;
+
+  if (currentFilters === undefined) {
+    currentFilters = store.getState().filters;
+  }
+
+  return !(
+    currentFilters.locations.length <= 0 ||
+    currentFilters.startDate === null ||
+    currentFilters.endDate === null
+  );
+};
+
+export {
+  isEmailValid,
+  isPhoneNumberValid,
+  isFormValid,
+  hasBookingInformation,
+  isFiltersValid,
+};

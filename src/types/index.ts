@@ -59,6 +59,7 @@ export interface ContactDetails {
 export enum ErrorList {
   GENERAL = "GENERAL",
   APT_TAKEN = "APT_TAKEN",
+  SIMILAR_APT_EXISTS = "SIMILAR_APT_EXISTS"
 }
 
 export interface BookableSlot extends Slot {
@@ -91,4 +92,29 @@ export interface BookAppointmentResponse extends Omit<Slot, 'parts'>{
   customers: ResponsePerson[];
   birthDate?: any;
   user?: any;
+}
+
+export enum TimeLineType{
+  START_TIMER,
+  NO_RECORDS,
+  NO_RECORDS_WITH_CLOSEST,
+  ERROR,
+  SIMILAR_APT_EXISTS,
+  MANY_FAILURES,
+  UNKNOWN
+}
+
+export interface TimeLineItem{
+  type: TimeLineType;
+  heading: string;
+  description: string;
+  timestamp: Date;
+}
+
+export enum SearchStatus {
+  SEARCHING_IN_PROGRESS,
+  WAIT,
+  BOOKING,
+  STOPPED,
+  UNKNOW
 }

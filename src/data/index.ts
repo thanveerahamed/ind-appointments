@@ -12,6 +12,7 @@ import {
 import { dayjs } from "../types/dayjs";
 import { Dayjs } from "dayjs";
 import { makeBookAppointmentRequest } from "../helpers/request";
+import { sortSlotsAscending } from "../helpers/slots";
 
 const url = "https://ind-api.000webhostapp.com/ind-service/index.php";
 
@@ -141,8 +142,7 @@ export const bookAppointment = async ({
     contactInformation,
     appointmentType
   );
-  console.log(JSON.stringify(payload));
-  return await fetch(url, {
+  return fetch(url, {
     method: "post",
     body: JSON.stringify({
       action: "reserveSlot",
@@ -158,4 +158,76 @@ export const bookAppointment = async ({
 
     return (await response.json()).data;
   });
+};
+
+const mapWithSlotId = (slots: Slot[], deskKey: string, deskName: string) => {
+  let response: SlotWithId[] = [];
+  for (const slot of slots) {
+    response.push({
+      ...slot,
+      deskName,
+      deskKey,
+      id: deskKey,
+    });
+  }
+
+  return response;
+};
+
+export const getAvailableSlotsForTimerView = async (
+  filters: Filters
+): Promise<{ matchingSlot?: SlotWithId; closestSlot?: SlotWithId }> => {
+  const promises = filters.locations.map(
+    async (location): Promise<AvailableSlotsWithLocation> => {
+      return {
+        deskKey: location.key,
+        deskName: location.name,
+        slots: await getAvailableSlots({
+          location: location.key,
+          appointmentType: filters.appointmentType,
+          people: filters.people,
+        }),
+      };
+    }
+  );
+
+  const availableSlotsWithDesks = await Promise.all(promises);
+
+  const sortedSlots = availableSlotsWithDesks
+    .reduce(
+      (
+        accumulatorSlotWithId: SlotWithId[],
+        slotWithLocation: AvailableSlotsWithLocation
+      ) => {
+        return [
+          ...accumulatorSlotWithId,
+          ...mapWithSlotId(
+            slotWithLocation.slots,
+            slotWithLocation.deskKey,
+            slotWithLocation.deskName
+          ),
+        ];
+      },
+      []
+    )
+    .sort(sortSlotsAscending);
+
+  const closestSlot = sortedSlots.length > 0 ? sortedSlots[0] : undefined;
+
+  const slotsMatchingDateTimeFilter = sortedSlots.filter((slot): boolean =>
+    dayjs(slot.date, "YYYY-MM-DD").isBetween(
+      (filters.startDate as Dayjs).format("YYYY-MM-DD"),
+      (filters.endDate as Dayjs).format("YYYY-MM-DD")
+    )
+  );
+
+  const matchingSlot =
+    slotsMatchingDateTimeFilter.length > 0
+      ? slotsMatchingDateTimeFilter[0]
+      : undefined;
+
+  return {
+    closestSlot,
+    matchingSlot,
+  };
 };

@@ -1,12 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Desk } from "../../types";
+import { BookAppointmentResponse, TimeLineItem } from "../../types";
 
 const initialState: {
   activeStep: number;
   retryInterval: number;
+  timeline: TimeLineItem[];
+  bookedSlot?: BookAppointmentResponse;
 } = {
   activeStep: 0,
   retryInterval: 5, // minutes
+  timeline: [],
+  bookedSlot: undefined,
 };
 
 export const timerSlice = createSlice({
@@ -24,9 +28,32 @@ export const timerSlice = createSlice({
         state.retryInterval = action.payload;
       }
     },
+    insertTimeLineItem: (state, action: PayloadAction<TimeLineItem>) => {
+      state.timeline.push(action.payload);
+      if(state.timeline.length > 10){
+          state.timeline.splice(1, 1);
+      }
+    },
+    stopTimerAndReset: (state) => {
+      state.activeStep = 0;
+      state.timeline = [];
+      state.bookedSlot = undefined;
+    },
+    updateBookedSlot: (
+      state,
+      action: PayloadAction<BookAppointmentResponse>
+    ) => {
+      state.bookedSlot = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { incrementStep, decrementStep, updateInterval } =
-  timerSlice.actions;
+export const {
+  incrementStep,
+  decrementStep,
+  updateInterval,
+  insertTimeLineItem,
+  stopTimerAndReset,
+  updateBookedSlot,
+} = timerSlice.actions;
