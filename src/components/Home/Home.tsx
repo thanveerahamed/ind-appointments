@@ -14,7 +14,8 @@ import { updateAvailableSlotsWithLocationToEmpty } from "../../store/reducers/sl
 import SnackBarAlert from "../common/SnackBarAlert/SnackBarAlert";
 import TimerQuery from "./TimeQuery/TimerQuery";
 import StopTimeConfirmationDialog from "./TimeQuery/StopTimeConfirmationDialog";
-import {stopTimerAndReset} from "../../store/reducers/timer";
+import { stopTimerAndReset } from "../../store/reducers/timer";
+import ErrorBoundaryContent from "../../App/App/ErrorBoundaryContent";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,6 +57,7 @@ const Home = () => {
     timer: { activeStep },
   } = useSelector((state: RootState) => state);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
   const [value, setValue] = useState(0);
   const [tempValue, setTempValue] = useState(0);
   const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -84,11 +86,16 @@ const Home = () => {
     dispatch(updateAvailableSlotsWithLocationToEmpty());
 
   const getDesks = async () => {
-    const desksList = await getAvailableDesks({
-      appointmentType: filters.appointmentType,
-    });
-    dispatch(updateDesks(desksList));
-    return desksList;
+    try {
+      const desksList = await getAvailableDesks({
+        appointmentType: filters.appointmentType,
+      });
+      dispatch(updateDesks(desksList));
+      return desksList;
+    } catch (e) {
+      setError(true);
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -111,7 +118,9 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.people]);
 
-  return (
+  return error ? (
+    <ErrorBoundaryContent></ErrorBoundaryContent>
+  ) : (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleTabChange} aria-label="query tabs">

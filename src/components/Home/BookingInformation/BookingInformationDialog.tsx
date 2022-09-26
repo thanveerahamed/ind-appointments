@@ -1,6 +1,3 @@
-import { Grid } from "@mui/material";
-import { ContactDetails, Person } from "../../../types";
-import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import * as React from "react";
 import { useState } from "react";

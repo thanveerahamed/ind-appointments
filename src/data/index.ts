@@ -19,9 +19,9 @@ const url = "https://ind-api.000webhostapp.com/ind-service/index.php";
 const handleError = async (response: Response) => {
   const errorResponse = await response.json();
   if (errorResponse.data !== undefined) {
-    throw Error(errorResponse.data);
+    throw new Error(errorResponse.data);
   } else {
-    throw Error(ErrorList.GENERAL);
+    throw new Error(ErrorList.GENERAL);
   }
 };
 
