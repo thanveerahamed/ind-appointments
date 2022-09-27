@@ -1,6 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BookAppointmentResponse, TimeLineItem } from "../../types";
 
+// minutes
+const minTimer = 25;
+const maxTimer = 45;
+
 const initialState: {
   activeStep: number;
   retryInterval: number;
@@ -8,7 +12,7 @@ const initialState: {
   bookedSlot?: BookAppointmentResponse;
 } = {
   activeStep: 0,
-  retryInterval: 5, // minutes
+  retryInterval: minTimer,
   timeline: [],
   bookedSlot: undefined,
 };
@@ -24,14 +28,14 @@ export const timerSlice = createSlice({
       state.activeStep--;
     },
     updateInterval: (state, action: PayloadAction<number>) => {
-      if (action.payload >= 5 && action.payload <= 45) {
+      if (action.payload >= minTimer && action.payload <= maxTimer) {
         state.retryInterval = action.payload;
       }
     },
     insertTimeLineItem: (state, action: PayloadAction<TimeLineItem>) => {
       state.timeline.push(action.payload);
-      if(state.timeline.length > 10){
-          state.timeline.splice(1, 1);
+      if (state.timeline.length > 10) {
+        state.timeline.splice(1, 1);
       }
     },
     stopTimerAndReset: (state) => {
