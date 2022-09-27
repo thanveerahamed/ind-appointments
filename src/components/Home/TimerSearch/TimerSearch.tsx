@@ -1,8 +1,8 @@
-import {Box, Grid} from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import Timeline from "@mui/lab/Timeline";
-import TimelineItem, {timelineItemClasses} from "@mui/lab/TimelineItem";
+import TimelineItem, { timelineItemClasses } from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
@@ -16,15 +16,29 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import moment from "moment";
 import ErrorIcon from "@mui/icons-material/Error";
-import {RootState, useAppDispatch} from "../../../store/store";
-import {incrementStep, insertTimeLineItem, stopTimerAndReset, updateBookedSlot,} from "../../../store/reducers/timer";
-import {ErrorList, SearchStatus, TimeLineItem, TimeLineType,} from "../../../types";
-import {blockSelectedSlot, bookAppointment, getAvailableSlotsForTimerView} from "../../../data";
-import {useSelector} from "react-redux";
+import { RootState, useAppDispatch } from "../../../store/store";
+import {
+  incrementStep,
+  insertTimeLineItem,
+  stopTimerAndReset,
+  updateBookedSlot,
+} from "../../../store/reducers/timer";
+import {
+  ErrorList,
+  SearchStatus,
+  TimeLineItem,
+  TimeLineType,
+} from "../../../types";
+import {
+  blockSelectedSlot,
+  bookAppointment,
+  getAvailableSlotsForTimerView,
+} from "../../../data";
+import { useSelector } from "react-redux";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
-import {getTimeLineHeadingAndDescription} from "./helper";
-import {formatTimeLineDate} from "../../../helpers/date";
-import {resetSlots,} from "../../../store/reducers/slots";
+import { getTimeLineHeadingAndDescription } from "./helper";
+import { formatTimeLineDate } from "../../../helpers/date";
+import { resetSlots } from "../../../store/reducers/slots";
 import TopTimeLineElement from "./TopTimeLineElement";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import useIsMobile from "./useIsMobile";
@@ -65,15 +79,15 @@ const TYPE_ICON_MAP = {
       <TimelineConnector />
     </TimelineSeparator>
   ),
-    [TimeLineType.MANY_FAILURES]: (
-        <TimelineSeparator>
-            <TimelineConnector sx={{ bgcolor: "error.main" }} />
-            <TimelineDot color="error">
-                <ErrorIcon />
-            </TimelineDot>
-            <TimelineConnector />
-        </TimelineSeparator>
-    ),
+  [TimeLineType.MANY_FAILURES]: (
+    <TimelineSeparator>
+      <TimelineConnector sx={{ bgcolor: "error.main" }} />
+      <TimelineDot color="error">
+        <ErrorIcon />
+      </TimelineDot>
+      <TimelineConnector />
+    </TimelineSeparator>
+  ),
   [TimeLineType.UNKNOWN]: (
     <TimelineSeparator>
       <TimelineConnector sx={{ bgcolor: "grey.main" }} />
@@ -96,6 +110,7 @@ const TYPE_ICON_MAP = {
 
 const TimerSearch = () => {
   const startTimerRef = useRef<boolean>(false);
+  const scrollDivRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useAppDispatch();
   const {
     filters,
@@ -116,15 +131,17 @@ const TimerSearch = () => {
   const performSearch = async () => {
     setSearchStatus(SearchStatus.SEARCHING_IN_PROGRESS);
 
-    if(timeline.filter(item => item.type === TimeLineType.ERROR).length > 10 ){
-        pushToTimeLine({
-            type: TimeLineType.MANY_FAILURES,
-            ...getTimeLineHeadingAndDescription(TimeLineType.MANY_FAILURES),
-            timestamp: new Date(),
-        });
+    if (
+      timeline.filter((item) => item.type === TimeLineType.ERROR).length > 10
+    ) {
+      pushToTimeLine({
+        type: TimeLineType.MANY_FAILURES,
+        ...getTimeLineHeadingAndDescription(TimeLineType.MANY_FAILURES),
+        timestamp: new Date(),
+      });
 
-        setSearchStatus(SearchStatus.STOPPED);
-        return;
+      setSearchStatus(SearchStatus.STOPPED);
+      return;
     }
 
     try {
@@ -132,8 +149,8 @@ const TimerSearch = () => {
       if (querySlots.matchingSlot !== undefined) {
         setSearchStatus(SearchStatus.BOOKING);
         await blockSelectedSlot({
-            slotWithId: querySlots.matchingSlot
-        })
+          slotWithId: querySlots.matchingSlot,
+        });
         const bookedSlot = await bookAppointment({
           slotWithId: querySlots.matchingSlot,
           persons: peopleInformation,
@@ -180,6 +197,9 @@ const TimerSearch = () => {
 
     setTargetDate(moment(new Date()).add(retryInterval, "minutes").toDate());
     setSearchStatus(SearchStatus.WAIT);
+    if(scrollDivRef.current) {
+        scrollDivRef.current.scrollTop = 0
+    }
   };
 
   const stopAndChangeInfo = () => {
@@ -220,18 +240,20 @@ const TimerSearch = () => {
       >
         Do not refresh the page, progress will be lost.
       </Alert>
-      <Box sx={{ margin: "20px", overflow: "scroll", height: "70vh" }}>
+      <Box ref={scrollDivRef} sx={{ margin: "20px", overflow: "scroll", height: "70vh" }}>
         <Grid container spacing={1}>
           <Grid item xs={12}>
             <Timeline
               position={isMobile ? undefined : "alternate"}
               sx={
-                isMobile ? {
-                  [`& .${timelineItemClasses.root}:before`]: {
-                    flex: 0,
-                    padding: 0,
-                  },
-                } : {}
+                isMobile
+                  ? {
+                      [`& .${timelineItemClasses.root}:before`]: {
+                        flex: 0,
+                        padding: 0,
+                      },
+                    }
+                  : {}
               }
             >
               <TopTimeLineElement
