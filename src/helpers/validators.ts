@@ -1,6 +1,6 @@
-import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from "../constants";
-import { ContactDetails, Filters, Person } from "../types";
-import store from "../store/store";
+import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from '../constants';
+import { ContactDetails, Filters, Person } from '../types';
+import store from '../store/store';
 
 const isEmailValid = (email: string) => email.match(EMAIL_REGEX);
 const isPhoneNumberValid = (phone: string) => phone.match(PHONE_NUMBER_REGEX);
@@ -15,9 +15,9 @@ const isFormValid = (contactInformation: ContactDetails, persons: Person[]) => {
 
   for (const person of persons) {
     if (
-      person.lastName === "" ||
-      person.firstName === "" ||
-      person.vNumber === ""
+      person.lastName === '' ||
+      person.firstName === '' ||
+      person.vNumber === ''
     ) {
       return false;
     }

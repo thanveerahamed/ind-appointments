@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { BookAppointmentResponse, TimeLineItem } from "../../types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { BookAppointmentResponse, TimeLineItem } from '../../types';
 
 // minutes
 const minTimer = 25;
@@ -18,7 +18,7 @@ const initialState: {
 };
 
 export const timerSlice = createSlice({
-  name: "timer",
+  name: 'timer',
   initialState,
   reducers: {
     incrementStep: (state) => {
@@ -45,7 +45,7 @@ export const timerSlice = createSlice({
     },
     updateBookedSlot: (
       state,
-      action: PayloadAction<BookAppointmentResponse>
+      action: PayloadAction<BookAppointmentResponse>,
     ) => {
       state.bookedSlot = action.payload;
     },

@@ -1,31 +1,31 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ContactDetails, Person } from "../../types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ContactDetails, Person } from '../../types';
 
 const initialState: {
   contactInformation: ContactDetails;
   peopleInformation: Person[];
 } = {
   contactInformation: {
-    email: "",
-    phone: "",
+    email: '',
+    phone: '',
   },
   peopleInformation: [
     {
-      bsn: "",
-      firstName: "",
-      lastName: "",
-      vNumber: "",
+      bsn: '',
+      firstName: '',
+      lastName: '',
+      vNumber: '',
     },
   ],
 };
 
 export const bookingInformationSlice = createSlice({
-  name: "bookingInformation",
+  name: 'bookingInformation',
   initialState,
   reducers: {
     updateContactInformation: (
       state,
-      action: PayloadAction<ContactDetails>
+      action: PayloadAction<ContactDetails>,
     ) => {
       state.contactInformation = action.payload;
     },
@@ -34,14 +34,18 @@ export const bookingInformationSlice = createSlice({
     },
     updatePersonInformation: (
       state,
-      action: PayloadAction<{ index: number; key: keyof Person; value: string }>
+      action: PayloadAction<{
+        index: number;
+        key: keyof Person;
+        value: string;
+      }>,
     ) => {
       state.peopleInformation[action.payload.index][action.payload.key] =
         action.payload.value;
     },
     updatePeopleInformationOnNumberOfPeopleChange: (
       state,
-      action: PayloadAction<number>
+      action: PayloadAction<number>,
     ) => {
       const peopleCount = action.payload;
       const currentPersonCount = state.peopleInformation.length;
@@ -50,10 +54,10 @@ export const bookingInformationSlice = createSlice({
         const incrementBy = peopleCount - currentPersonCount;
         for (let i = 1; i <= incrementBy; i++) {
           data.push({
-            bsn: "",
-            firstName: "",
-            lastName: "",
-            vNumber: "",
+            bsn: '',
+            firstName: '',
+            lastName: '',
+            vNumber: '',
           });
         }
       } else {
