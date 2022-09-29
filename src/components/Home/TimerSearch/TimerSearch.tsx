@@ -42,6 +42,7 @@ import { resetSlots } from "../../../store/reducers/slots";
 import TopTimeLineElement from "./TopTimeLineElement";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import useIsMobile from "./useIsMobile";
+import {Dayjs} from "../../../types/dayjs";
 
 const TYPE_ICON_MAP = {
   [TimeLineType.START_TIMER]: (
@@ -229,17 +230,55 @@ const TimerSearch = () => {
 
   return (
     <>
-      <Alert
-        variant="outlined"
-        severity="warning"
-        action={
-          <Button color="inherit" size="small" onClick={stopAndChangeInfo}>
-            Stop & change information
-          </Button>
-        }
-      >
-        Do not refresh the page, progress will be lost.
-      </Alert>
+        <Grid container spacing={1}>
+            <Grid item xs={12}>
+                <Box
+                    sx={{
+                        marginLeft: { xs: '0', sm: '10%' },
+                        marginRight: { xs: '0', sm: '10%' },
+                    }}
+                >
+                    <Alert
+                        variant="outlined"
+                        severity="warning"
+                        action={
+                            <Button
+                                color="inherit"
+                                size="small"
+                                onClick={stopAndChangeInfo}
+                            >
+                                Stop & change information
+                            </Button>
+                        }
+                    >
+                        Do not refresh the page, progress will be lost.
+                    </Alert>
+                </Box>
+            </Grid>
+            <Grid item xs={12}>
+                <Box
+                    sx={{
+                        marginLeft: { xs: '0', sm: '10%' },
+                        marginRight: { xs: '0', sm: '10%' },
+                    }}
+                >
+                    <Alert variant="outlined" severity="info">
+                        Searching {filters.appointmentType} for {filters.people} person(s)
+                        at {filters.locations.map((location) => location.name).join(',')}{' '}
+                        between{' '}
+                        {formatTimeLineDate(
+                            (filters.startDate as Dayjs).toDate(),
+                            'MMMM Do YYYY',
+                        )}{' '}
+                        and{' '}
+                        {formatTimeLineDate(
+                            (filters.endDate as Dayjs).toDate(),
+                            'MMMM Do YYYY',
+                        )}
+                    </Alert>
+                </Box>
+            </Grid>
+        </Grid>
       <Box ref={scrollDivRef} sx={{ margin: "20px", overflow: "scroll", height: "70vh" }}>
         <Grid container spacing={1}>
           <Grid item xs={12}>
