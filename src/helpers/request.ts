@@ -4,7 +4,7 @@ import {
   Person,
   Slot,
   SlotWithId,
-} from "../types";
+} from '../types';
 
 export const makeRequestSlot = (slot: SlotWithId): Slot => {
   const { id, deskName, deskKey, ...rest } = slot;
@@ -15,7 +15,7 @@ export const makeBookAppointmentRequest = (
   slot: SlotWithId,
   persons: Person[],
   contact: ContactDetails,
-appointmentType: string
+  appointmentType: string,
 ): BookAppointmentRequest => {
   return {
     appointment: {
@@ -23,7 +23,7 @@ appointmentType: string
       phone: contact.phone,
       email: contact.email,
       productKey: appointmentType,
-      language: "en",
+      language: 'en',
       customers: persons,
     },
     bookableSlot: {

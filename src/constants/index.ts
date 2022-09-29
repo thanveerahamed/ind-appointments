@@ -1,21 +1,21 @@
-import {ValueLabelPair} from "../types";
+import { ValueLabelPair } from '../types';
 
-export enum ALERT_SEVERITY{
-    INFO = 'info',
-    ERROR= 'error',
-    WARNING = 'warning'
+export enum ALERT_SEVERITY {
+  INFO = 'info',
+  ERROR = 'error',
+  WARNING = 'warning',
 }
 
 export const APPOINTMENT_TYPES: ValueLabelPair[] = [
-    {
-        value: "BIO",
-        label: "Biometric"
-    },
-    {
-        value: "DOC",
-        label: "Document collection"
-    }
-]
+  {
+    value: 'BIO',
+    label: 'Biometric',
+  },
+  {
+    value: 'DOC',
+    label: 'Document collection',
+  },
+];
 
 // eslint-disable-next-line no-useless-escape
 export const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;

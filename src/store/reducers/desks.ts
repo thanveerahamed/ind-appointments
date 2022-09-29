@@ -1,14 +1,14 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {Desk} from "../../types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Desk } from '../../types';
 
 const initialState: {
-  availableDesks: Desk[]
+  availableDesks: Desk[];
 } = {
-  availableDesks: []
+  availableDesks: [],
 };
 
 export const desksSlice = createSlice({
-  name: "desks",
+  name: 'desks',
   initialState,
   reducers: {
     updateDesks: (state, action: PayloadAction<Desk[]>) => {

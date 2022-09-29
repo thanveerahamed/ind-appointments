@@ -1,11 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SnackbarOrigin } from "@mui/material/Snackbar";
-import { AlertColor } from "@mui/material/Alert/Alert";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SnackbarOrigin } from '@mui/material/Snackbar';
+import { AlertColor } from '@mui/material/Alert/Alert';
 
-const defaultAlertSeverity: AlertColor = "error";
+const defaultAlertSeverity: AlertColor = 'error';
 const defaultSnackBarOrigin: SnackbarOrigin = {
-  vertical: "top",
-  horizontal: "center",
+  vertical: 'top',
+  horizontal: 'center',
 };
 
 const initialState: {
@@ -16,14 +16,14 @@ const initialState: {
   snackBarAutoHideDuration: number;
 } = {
   showSnackBar: false,
-  snackBarMessage: "",
+  snackBarMessage: '',
   snackBarOrigin: defaultSnackBarOrigin,
   snackBarSeverity: defaultAlertSeverity,
   snackBarAutoHideDuration: 3000,
 };
 
 export const alertsSlice = createSlice({
-  name: "alerts",
+  name: 'alerts',
   initialState,
   reducers: {
     showSnackbar: (
@@ -32,7 +32,7 @@ export const alertsSlice = createSlice({
         message: string;
         origin?: SnackbarOrigin;
         severity?: AlertColor;
-      }>
+      }>,
     ) => {
       state.showSnackBar = true;
       state.snackBarMessage = action.payload.message;
@@ -45,7 +45,7 @@ export const alertsSlice = createSlice({
     },
     hideSnackbar: (state) => {
       state.showSnackBar = false;
-      state.snackBarMessage = "";
+      state.snackBarMessage = '';
       state.snackBarOrigin = defaultSnackBarOrigin;
       state.snackBarSeverity = defaultAlertSeverity;
     },

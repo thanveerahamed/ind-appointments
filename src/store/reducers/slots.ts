@@ -1,5 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {AvailableSlotsWithLocation, BookAppointmentResponse, SlotWithId} from "../../types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  AvailableSlotsWithLocation,
+  BookAppointmentResponse,
+  SlotWithId,
+} from '../../types';
 
 const initialState: {
   selectedSlot?: SlotWithId;
@@ -8,11 +12,11 @@ const initialState: {
 } = {
   selectedSlot: undefined,
   availableSlots: [],
-  bookedSlotResponse: undefined
+  bookedSlotResponse: undefined,
 };
 
 export const slotsSlice = createSlice({
-  name: "slots",
+  name: 'slots',
   initialState,
   reducers: {
     slotSelected: (state, action: PayloadAction<SlotWithId | undefined>) => {
@@ -20,21 +24,24 @@ export const slotsSlice = createSlice({
     },
     updateAvailableSlotsWithLocation: (
       state,
-      action: PayloadAction<AvailableSlotsWithLocation[]>
+      action: PayloadAction<AvailableSlotsWithLocation[]>,
     ) => {
       state.availableSlots = action.payload;
     },
     updateAvailableSlotsWithLocationToEmpty: (state) => {
       state.availableSlots = [];
     },
-    updateBookedSlotResponse: (state, action: PayloadAction<BookAppointmentResponse>) => {
+    updateBookedSlotResponse: (
+      state,
+      action: PayloadAction<BookAppointmentResponse>,
+    ) => {
       state.bookedSlotResponse = action.payload;
     },
-    resetSlots:  (state) => {
+    resetSlots: (state) => {
       state.selectedSlot = undefined;
       state.availableSlots = [];
       state.bookedSlotResponse = undefined;
-    }
+    },
   },
 });
 
@@ -44,5 +51,5 @@ export const {
   updateAvailableSlotsWithLocation,
   updateAvailableSlotsWithLocationToEmpty,
   updateBookedSlotResponse,
-  resetSlots
+  resetSlots,
 } = slotsSlice.actions;

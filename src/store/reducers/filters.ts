@@ -1,17 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { dayjs, Dayjs } from "../../types/dayjs";
-import { Desk, Filters } from "../../types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { dayjs, Dayjs } from '../../types/dayjs';
+import { Desk, Filters } from '../../types';
 
 const initialState: Filters = {
-  appointmentType: "BIO",
-  people: "1",
+  appointmentType: 'BIO',
+  people: '1',
   locations: [],
   startDate: dayjs(),
-  endDate: dayjs().add(3, "month"),
+  endDate: dayjs().add(3, 'month'),
 };
 
 export const filtersSlice = createSlice({
-  name: "filters",
+  name: 'filters',
   initialState,
   reducers: {
     changeAppointmentType: (state, action: PayloadAction<string>) => {
@@ -30,9 +30,9 @@ export const filtersSlice = createSlice({
     changeDates: (
       state,
       action: PayloadAction<{
-        key: "startDate" | "endDate";
+        key: 'startDate' | 'endDate';
         value: Dayjs | null;
-      }>
+      }>,
     ) => {
       state[action.payload.key] = action.payload.value;
     },

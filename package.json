@@ -37,6 +37,7 @@
     "deploy": "gh-pages -d build",
     "start": "react-scripts start && c",
     "build": "react-scripts build",
+    "format": "prettier --write '**/*.{js,json,md,ts,yml,yaml}'",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

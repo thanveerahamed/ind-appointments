@@ -1,4 +1,4 @@
-import { Dayjs } from "./dayjs";
+import { Dayjs } from './dayjs';
 
 export interface Filters {
   appointmentType: string;
@@ -46,7 +46,7 @@ export interface Person {
   lastName: string;
 }
 
-export interface ResponsePerson extends Person{
+export interface ResponsePerson extends Person {
   vnumber: string;
   fullName: string;
 }
@@ -57,16 +57,16 @@ export interface ContactDetails {
 }
 
 export enum ErrorList {
-  GENERAL = "GENERAL",
-  APT_TAKEN = "APT_TAKEN",
-  SIMILAR_APT_EXISTS = "SIMILAR_APT_EXISTS"
+  GENERAL = 'GENERAL',
+  APT_TAKEN = 'APT_TAKEN',
+  SIMILAR_APT_EXISTS = 'SIMILAR_APT_EXISTS',
 }
 
 export interface BookableSlot extends Slot {
   booked: boolean;
 }
 
-export interface Appointment extends Omit<Slot, "key"> {
+export interface Appointment extends Omit<Slot, 'key'> {
   productKey: string;
   phone: string;
   email: string;
@@ -79,7 +79,7 @@ export interface BookAppointmentRequest {
   appointment: Appointment;
 }
 
-export interface BookAppointmentResponse extends Omit<Slot, 'parts'>{
+export interface BookAppointmentResponse extends Omit<Slot, 'parts'> {
   version: number;
   code: string;
   productKey: string;
@@ -94,17 +94,17 @@ export interface BookAppointmentResponse extends Omit<Slot, 'parts'>{
   user?: any;
 }
 
-export enum TimeLineType{
+export enum TimeLineType {
   START_TIMER,
   NO_RECORDS,
   NO_RECORDS_WITH_CLOSEST,
   ERROR,
   SIMILAR_APT_EXISTS,
   MANY_FAILURES,
-  UNKNOWN
+  UNKNOWN,
 }
 
-export interface TimeLineItem{
+export interface TimeLineItem {
   type: TimeLineType;
   heading: string;
   description: string;
@@ -116,5 +116,5 @@ export enum SearchStatus {
   WAIT,
   BOOKING,
   STOPPED,
-  UNKNOW
+  UNKNOW,
 }
