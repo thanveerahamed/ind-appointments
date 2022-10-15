@@ -4,18 +4,13 @@ import useIsMobile from '../../common/hooks/useIsMobile';
 import ManualQueryMobileView from './mobile/ManualQueryMobileView';
 import ManualQueryWebView from './web/ManualQueryWebView';
 
-interface Props {
-  loading: boolean;
-  setLoading: (flag: boolean) => void;
-}
-
-const ManualQuery = (props: Props) => {
+const ManualQuery = () => {
   const isMobile = useIsMobile();
 
   return isMobile ? (
-    <ManualQueryMobileView {...props} />
+    <ManualQueryMobileView  />
   ) : (
-    <ManualQueryWebView {...props} />
+    <ManualQueryWebView  />
   );
 };
 

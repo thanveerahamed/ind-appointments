@@ -1,21 +1,28 @@
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Box from "@mui/material/Box";
-import { SyntheticEvent, useEffect, useState } from "react";
-import Fade from "@mui/material/Fade";
-import ManualQuery from "./ManualQuery/ManualQuery";
-import { changeLocations } from "../../store/reducers/filters";
-import { updatePeopleInformationOnNumberOfPeopleChange } from "../../store/reducers/bookingInformation";
-import { RootState, useAppDispatch } from "../../store/store";
-import { useSelector } from "react-redux";
-import { getAvailableDesks } from "../../data";
-import { updateDesks } from "../../store/reducers/desks";
-import { updateAvailableSlotsWithLocationToEmpty } from "../../store/reducers/slots";
-import SnackBarAlert from "../common/SnackBarAlert/SnackBarAlert";
-import TimerQuery from "./TimeQuery/TimerQuery";
-import StopTimeConfirmationDialog from "./TimeQuery/StopTimeConfirmationDialog";
-import { stopTimerAndReset } from "../../store/reducers/timer";
-import ErrorBoundaryContent from "../../App/App/ErrorBoundaryContent";
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import { SyntheticEvent, useEffect, useState } from 'react';
+import Fade from '@mui/material/Fade';
+import ManualQuery from './ManualQuery/ManualQuery';
+import {changeLocations, setLoading as setFilterLoading} from '../../store/reducers/filters';
+import { updatePeopleInformationOnNumberOfPeopleChange } from '../../store/reducers/bookingInformation';
+import { RootState, useAppDispatch } from '../../store/store';
+import { useSelector } from 'react-redux';
+import { getAvailableDesks, getAvailableSlotsWithDesk } from '../../data';
+import { updateDesks } from '../../store/reducers/desks';
+import {
+  updateAvailableSlotsWithLocation,
+  updateAvailableSlotsWithLocationToEmpty,
+  setLoading as setGridLoading,
+} from '../../store/reducers/slots';
+import SnackBarAlert from '../common/SnackBarAlert/SnackBarAlert';
+import TimerQuery from './TimeQuery/TimerQuery';
+import StopTimeConfirmationDialog from './TimeQuery/StopTimeConfirmationDialog';
+import { stopTimerAndReset } from '../../store/reducers/timer';
+import ErrorBoundaryContent from '../../App/App/ErrorBoundaryContent';
+import { isFiltersValid } from '../../helpers/validators';
+import { showSnackbar } from '../../store/reducers/alerts';
+import { AvailableSlotsWithLocation } from '../../types';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -46,17 +53,17 @@ const TabPanel = (props: TabPanelProps) => {
 const a11yProps = (index: number) => {
   return {
     id: `query-tab-${index}`,
-    "aria-controls": `query-tabpanel-${index}`,
+    'aria-controls': `query-tabpanel-${index}`,
   };
 };
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const {
-    filters,
+    filters: { criteria: filters },
     timer: { activeStep },
+    desks: { availableDesks },
   } = useSelector((state: RootState) => state);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [value, setValue] = useState(0);
   const [tempValue, setTempValue] = useState(0);
@@ -84,6 +91,8 @@ const Home = () => {
 
   const dispatchSetAvailableSlotToEmpty = () =>
     dispatch(updateAvailableSlotsWithLocationToEmpty());
+  const dispatchAvailableSlotUpdate = (slots: AvailableSlotsWithLocation[]) =>
+    dispatch(updateAvailableSlotsWithLocation(slots));
 
   const getDesks = async () => {
     try {
@@ -100,11 +109,11 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
+      dispatch(setFilterLoading(true));
       dispatchSetAvailableSlotToEmpty();
       const desks = await getDesks();
-      dispatch(changeLocations(desks.length > 0 ? [desks[0]] : []));
-      setLoading(false);
+      dispatch(updateDesks(desks));
+      dispatch(setFilterLoading(false));
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.appointmentType]);
@@ -112,24 +121,60 @@ const Home = () => {
   useEffect(() => {
     dispatch(
       updatePeopleInformationOnNumberOfPeopleChange(
-        parseInt(filters.people, 10)
-      )
+        parseInt(filters.people, 10),
+      ),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.people]);
 
+  useEffect(() => {
+    (async () => {
+      dispatch(
+        changeLocations(availableDesks.length > 0 ? [availableDesks[0]] : []),
+      );
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableDesks]);
+
+  useEffect(() => {
+    (async () => {
+      const isFilterValid = isFiltersValid(filters);
+
+      if (isFilterValid) {
+        dispatch(setGridLoading(true));
+        try {
+          const availableSlotsWithDesk = await getAvailableSlotsWithDesk(
+            filters,
+          );
+          dispatchAvailableSlotUpdate(availableSlotsWithDesk);
+        } catch (error: unknown) {
+          dispatch(
+            showSnackbar({
+              message: 'Some unknown error occurred. Please refresh the page',
+              severity: 'error',
+            }),
+          );
+        }
+      } else {
+        dispatchSetAvailableSlotToEmpty();
+      }
+      dispatch(setGridLoading(false));
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
   return error ? (
     <ErrorBoundaryContent></ErrorBoundaryContent>
   ) : (
-    <Box sx={{ width: "100%" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleTabChange} aria-label="query tabs">
           <Tab label="Search" {...a11yProps(0)} />
           <Tab label="Scheduler" {...a11yProps(1)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <ManualQuery loading={loading} setLoading={setLoading}></ManualQuery>
+        <ManualQuery></ManualQuery>
       </TabPanel>
       <TabPanel value={value} index={1}>
         <TimerQuery />

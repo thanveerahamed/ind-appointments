@@ -1,42 +1,42 @@
-import { Box, Grid } from "@mui/material";
-import ErrorImage from "../../assets/images/error.png";
-import Typography from "@mui/material/Typography";
-import { useState } from "react";
-import { LoadingButton } from "@mui/lab";
+import { Box, Grid } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import { useState } from 'react';
+import { LoadingButton } from '@mui/lab';
+import Lottie from 'lottie-react';
+import errorAnimation from '../../assets/lottie/errorMessage.json';
 
 const ErrorBoundaryContent = () => {
   const [loading, setLoading] = useState<boolean>(false);
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <div
+        <Lottie
+          animationData={errorAnimation}
           style={{
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto",
-            width: "250px",
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            width: '50%',
           }}
-        >
-          <img src={ErrorImage} width="100%" height="100%" alt="error"></img>
-        </div>
+        />
       </Grid>
       <Grid item xs={12}>
         <Box
           sx={{
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto",
-            width: "50%",
+            display: 'block',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            width: '50%',
+            textAlign: 'center',
           }}
         >
           <Typography variant="h4">Oh crap!!! IND hates you! :) </Typography>
           <LoadingButton
-            sx={{ marginTop: "10px" }}
+            sx={{ marginTop: '10px' }}
             variant="contained"
             loading={loading}
             onClick={() => {
-                setLoading(true);
-                window.location.reload();
+              setLoading(true);
+              window.location.reload();
             }}
           >
             Try again.

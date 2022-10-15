@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -20,13 +20,17 @@ import {
 } from '../../../store/reducers/filters';
 import { RootState, useAppDispatch } from '../../../store/store';
 import { useSelector } from 'react-redux';
+import CircularProgress from '@mui/material/CircularProgress';
+import Backdrop from '@mui/material/Backdrop';
 
 const FilterForm = () => {
   const dispatch = useAppDispatch();
   const { availableDesks: desks } = useSelector(
     (state: RootState) => state.desks,
   );
-  const { filters } = useSelector((state: RootState) => state);
+  const {
+    filters: { criteria, loading: filterLoading },
+  } = useSelector((state: RootState) => state);
 
   const handleAppointmentTypeChange = (event: SelectChangeEvent) => {
     dispatch(changeAppointmentType(event.target.value));
@@ -48,108 +52,130 @@ const FilterForm = () => {
   };
 
   return (
-    <Grid container spacing={1}>
-      <Grid item xs={6}>
-        <FormControl sx={{ width: '100%' }}>
-          <InputLabel required>Appointment Type</InputLabel>
-          <Select
-            value={filters.appointmentType}
-            label="Appointment Type"
-            onChange={handleAppointmentTypeChange}
-          >
-            {APPOINTMENT_TYPES.map((type) => {
-              return (
-                <MenuItem key={type.value} value={type.value}>
-                  {type.label}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={6}>
-        <FormControl sx={{ width: '100%' }}>
-          <InputLabel required>Persons</InputLabel>
-          <Select
-            value={filters.people}
-            label="Persons"
-            onChange={handlePeopleChange}
-          >
-            {[1, 2, 3, 4, 5, 6].map((num) => {
-              return (
-                <MenuItem key={num} value={num}>
-                  {num}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={6} sx={{ marginTop: '20px' }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="Start date"
-            value={filters.startDate}
-            inputFormat={'DD-MM-YYYY'}
-            onChange={(newValue) => {
-              handleDateChange('startDate', newValue);
-            }}
-            minDate={dayjs()}
-            renderInput={(params) => (
-              <TextField {...params} sx={{ width: '100%' }} required disabled />
-            )}
-          />
-        </LocalizationProvider>
-      </Grid>
-      <Grid item xs={6} sx={{ marginTop: '20px' }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="End date"
-            inputFormat={'DD-MM-YYYY'}
-            minDate={filters.startDate?.add(1, 'day')}
-            value={filters.endDate}
-            onChange={(newValue) => {
-              handleDateChange('endDate', newValue);
-            }}
-            renderInput={(params) => (
-              <TextField {...params} sx={{ width: '100%' }} required disabled />
-            )}
-          />
-        </LocalizationProvider>
-      </Grid>
-      <Grid item xs={12} sx={{ marginTop: '20px' }}>
-        {desks.length > 0 && (
-          <FormControl component="fieldset" fullWidth>
-            <Autocomplete
-              id="tags-outlined"
-              value={filters.locations}
-              onChange={(event: any, newValue: Desk[] | null) => {
-                if (newValue !== null) {
-                  handleDeskChange(newValue);
-                }
+    <Box sx={{ position: 'relative' }}>
+      <Grid container spacing={1}>
+        <Grid item xs={6}>
+          <FormControl sx={{ width: '100%' }}>
+            <InputLabel required>Appointment Type</InputLabel>
+            <Select
+              value={criteria.appointmentType}
+              label="Appointment Type"
+              onChange={handleAppointmentTypeChange}
+            >
+              {APPOINTMENT_TYPES.map((type) => {
+                return (
+                  <MenuItem key={type.value} value={type.value}>
+                    {type.label}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={6}>
+          <FormControl sx={{ width: '100%' }}>
+            <InputLabel required>Persons</InputLabel>
+            <Select
+              value={criteria.people}
+              label="Persons"
+              onChange={handlePeopleChange}
+            >
+              {[1, 2, 3, 4, 5, 6].map((num) => {
+                return (
+                  <MenuItem key={num} value={num}>
+                    {num}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={6} sx={{ marginTop: '20px' }}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Start date"
+              value={criteria.startDate}
+              inputFormat={'DD-MM-YYYY'}
+              onChange={(newValue) => {
+                handleDateChange('startDate', newValue);
               }}
-              multiple
-              options={desks}
-              getOptionLabel={(option) => option.name}
+              minDate={dayjs()}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  error={filters.locations.length <= 0}
-                  helperText={
-                    filters.locations.length <= 0
-                      ? 'Minimum 1 location required.'
-                      : undefined
-                  }
+                  sx={{ width: '100%' }}
                   required
-                  label="Locations (max. 5)"
-                  placeholder="Maximum 5 locations"
+                  disabled
                 />
               )}
             />
-          </FormControl>
-        )}
+          </LocalizationProvider>
+        </Grid>
+        <Grid item xs={6} sx={{ marginTop: '20px' }}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="End date"
+              inputFormat={'DD-MM-YYYY'}
+              minDate={criteria.startDate?.add(1, 'day')}
+              value={criteria.endDate}
+              onChange={(newValue) => {
+                handleDateChange('endDate', newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  sx={{ width: '100%' }}
+                  required
+                  disabled
+                />
+              )}
+            />
+          </LocalizationProvider>
+        </Grid>
+        <Grid item xs={12} sx={{ marginTop: '20px' }}>
+          {desks.length > 0 && (
+            <FormControl component="fieldset" fullWidth>
+              <Autocomplete
+                id="tags-outlined"
+                value={criteria.locations}
+                onChange={(event: any, newValue: Desk[] | null) => {
+                  if (newValue !== null) {
+                    handleDeskChange(newValue);
+                  }
+                }}
+                multiple
+                options={desks}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    error={criteria.locations.length <= 0}
+                    helperText={
+                      criteria.locations.length <= 0
+                        ? 'Minimum 1 location required.'
+                        : undefined
+                    }
+                    required
+                    label="Locations (max. 5)"
+                    placeholder="Maximum 5 locations"
+                  />
+                )}
+              />
+            </FormControl>
+          )}
+        </Grid>
       </Grid>
-    </Grid>
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.modal + 1000,
+          position: 'absolute',
+        }}
+        open={filterLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </Box>
   );
 };
 

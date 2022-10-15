@@ -21,7 +21,7 @@ const SelectedSlotView = () => {
     filters,
     bookingInformation: { contactInformation, peopleInformation },
   } = useSelector((state: RootState) => state);
-  const { appointmentType, people } = filters;
+  const { appointmentType, people } = filters.criteria;
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleBookSlot = async () => {

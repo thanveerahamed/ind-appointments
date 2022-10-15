@@ -115,7 +115,7 @@ const TimerSearch = () => {
   const scrollDivRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useAppDispatch();
   const {
-    filters,
+    filters: { criteria: filters },
     timer: { timeline, retryInterval },
     bookingInformation: { contactInformation, peopleInformation },
   } = useSelector((state: RootState) => state);

@@ -9,10 +9,12 @@ const initialState: {
   selectedSlot?: SlotWithId;
   availableSlots: AvailableSlotsWithLocation[];
   bookedSlotResponse?: BookAppointmentResponse;
+  loading: boolean;
 } = {
   selectedSlot: undefined,
   availableSlots: [],
   bookedSlotResponse: undefined,
+  loading: false,
 };
 
 export const slotsSlice = createSlice({
@@ -42,6 +44,13 @@ export const slotsSlice = createSlice({
       state.availableSlots = [];
       state.bookedSlotResponse = undefined;
     },
+    resetSelectedSlot: (state) => {
+      state.selectedSlot = undefined;
+      state.bookedSlotResponse = undefined;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
   },
 });
 
@@ -52,4 +61,6 @@ export const {
   updateAvailableSlotsWithLocationToEmpty,
   updateBookedSlotResponse,
   resetSlots,
+  setLoading,
+  resetSelectedSlot,
 } = slotsSlice.actions;

@@ -7,14 +7,11 @@ import { RootState } from '../../../../store/store';
 import FilterDialog from './FilterDialog';
 import { makeFilterQueryText } from '../../../../helpers/filters';
 
-interface Props {
-  loading: boolean;
-  setLoading: (flag: boolean) => void;
-}
-
-const ManualQueryMobileView = ({ loading, setLoading }: Props) => {
+const ManualQueryMobileView = () => {
   const [openFilterDialog, setOpenFilterDialog] = React.useState(false);
-  const { filters } = useSelector((state: RootState) => state);
+  const {
+    filters: { criteria: filters },
+  } = useSelector((state: RootState) => state);
 
   return (
     <Box sx={{ margin: '5px' }}>
