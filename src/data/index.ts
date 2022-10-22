@@ -16,6 +16,26 @@ import { sortSlotsAscending } from '../helpers/slots';
 
 const url = 'https://ind-api.000webhostapp.com/ind-service/index.php';
 
+enum PostAction {
+  GET_DESKS = 'getDesks',
+  GET_SLOTS = 'getSlots',
+  BLOCK_SLOT = 'blockSlot',
+  RESERVE_SLOT = 'reserveSlot',
+}
+
+const localEndpointMap = {
+  [PostAction.GET_DESKS]: 'http://localhost:8003/ind-service',
+  [PostAction.GET_SLOTS]: 'http://localhost:8000/ind-service',
+  [PostAction.BLOCK_SLOT]: 'http://localhost:8002/ind-service',
+  [PostAction.RESERVE_SLOT]: 'http://localhost:8001/ind-service',
+};
+
+const getServerUrl = (action: PostAction) => {
+  return process.env.NODE_ENV === 'development'
+    ? localEndpointMap[action]
+    : url;
+};
+
 const handleError = async (response: Response) => {
   const errorResponse = await response.json();
   if (errorResponse.data !== undefined) {
@@ -30,10 +50,10 @@ export const getAvailableDesks = async ({
 }: {
   appointmentType: string;
 }): Promise<Desk[]> => {
-  return await fetch(url, {
+  return await fetch(getServerUrl(PostAction.GET_DESKS), {
     method: 'post',
     body: JSON.stringify({
-      action: 'getDesks',
+      action: PostAction.GET_DESKS,
       data: {
         productType: appointmentType,
       },
@@ -56,10 +76,10 @@ export const getAvailableSlots = async ({
   appointmentType: string;
   people: string;
 }): Promise<Slot[]> => {
-  return await fetch(url, {
+  return await fetch(getServerUrl(PostAction.GET_SLOTS), {
     method: 'post',
     body: JSON.stringify({
-      action: 'getSlots',
+      action: PostAction.GET_SLOTS,
       data: {
         desk: location,
         productType: appointmentType,
@@ -107,10 +127,10 @@ export const blockSelectedSlot = async ({
 }: {
   slotWithId: SlotWithId;
 }): Promise<Slot[]> => {
-  return await fetch(url, {
+  return await fetch(getServerUrl(PostAction.BLOCK_SLOT), {
     method: 'post',
     body: JSON.stringify({
-      action: 'blockSlot',
+      action: PostAction.BLOCK_SLOT,
       data: {
         desk: slotWithId.deskKey,
         payload: slotWithId as Slot,
@@ -136,16 +156,20 @@ export const bookAppointment = async ({
   persons: Person[];
   appointmentType: string;
 }): Promise<BookAppointmentResponse> => {
+  await blockSelectedSlot({
+    slotWithId,
+  });
+
   const payload = makeBookAppointmentRequest(
     slotWithId,
     persons,
     contactInformation,
     appointmentType,
   );
-  return fetch(url, {
+  return fetch(getServerUrl(PostAction.RESERVE_SLOT), {
     method: 'post',
     body: JSON.stringify({
-      action: 'reserveSlot',
+      action: PostAction.RESERVE_SLOT,
       data: {
         desk: slotWithId.deskKey,
         payload,

@@ -1,25 +1,25 @@
-import { Box, Grid, Paper } from "@mui/material";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import { ColorLibConnector, ColorLibStepIcon } from "./ColorLib";
-import { ChangeEvent, useState } from "react";
-import FilterSection from "../FilterSection/FilterSection";
-import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "../../../store/store";
+import { Box, Grid, Paper } from '@mui/material';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import { ColorLibConnector, ColorLibStepIcon } from './ColorLib';
+import { ChangeEvent, useState } from 'react';
+import FilterSection from '../../common/FilterSection/FilterSection';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../../store/store';
 import {
   decrementStep,
   incrementStep,
   stopTimerAndReset,
   updateInterval,
-} from "../../../store/reducers/timer";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { isFiltersValid, isFormValid } from "../../../helpers/validators";
-import BookingInformationView from "../BookingInformation/BookingInformationView";
-import TimerSearch from "../TimerSearch/TimerSearch";
-import BookedAppointmentView from "../BookedAppointmentView/BookedAppointmentView";
-import { resetSlots } from "../../../store/reducers/slots";
+} from '../../../store/reducers/timer';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import { isFiltersValid, isFormValid } from '../../../helpers/validators';
+import BookingInformationView from '../BookingInformation/BookingInformationView';
+import TimerSearch from '../TimerSearch/TimerSearch';
+import BookedAppointmentView from '../BookedAppointmentView/BookedAppointmentView';
+import { resetSlots } from '../../../store/reducers/slots';
 
 const TimerQuery = () => {
   const dispatch = useAppDispatch();
@@ -36,7 +36,7 @@ const TimerQuery = () => {
     let canMoveNext = false;
     switch (activeStep) {
       case 0:
-        canMoveNext = isFiltersValid(filters);
+        canMoveNext = isFiltersValid(filters.criteria);
         break;
 
       case 1:
@@ -51,7 +51,7 @@ const TimerQuery = () => {
   };
   const stepBack = () => dispatch(decrementStep());
   const handleIntervalChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => dispatch(updateInterval(parseInt(event.target.value, 10)));
 
   const resetStepper = () => {
@@ -60,7 +60,7 @@ const TimerQuery = () => {
   };
 
   return (
-    <Paper sx={{ padding: "20px 0" }}>
+    <Paper sx={{ padding: '20px 0' }}>
       <Box>
         <Stepper
           alternativeLabel
@@ -91,14 +91,14 @@ const TimerQuery = () => {
         {activeStep === 0 && (
           <Grid container spacing={1}>
             <Grid item xs={12}>
-              <FilterSection showActions={false} />
+              <FilterSection />
             </Grid>
             <Grid item xs={12}>
-              <Box sx={{ float: "right" }}>
+              <Box sx={{ float: 'right' }}>
                 <Button
                   variant="contained"
                   color="success"
-                  sx={{ margin: "0 20px" }}
+                  sx={{ margin: '0 20px' }}
                   onClick={stepNext}
                 >
                   Next
@@ -110,39 +110,34 @@ const TimerQuery = () => {
         {activeStep === 1 && (
           <Grid container spacing={1}>
             <Grid item xs={12}>
-              <Box sx={{ margin: "20px" }}>
+              <Box sx={{ margin: '20px' }}>
                 <BookingInformationView submitted={bookingInfoSubmitted} />
               </Box>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                  sx={{ margin: "0 20px" }}
-                  type="number"
-                  label="Retry interval (in mins)"
-                  value={retryInterval}
-                  onChange={handleIntervalChange}
-                  inputProps={{
-                    style: {
-                      height: "10px",
-                    },
-                  }}
+                sx={{ margin: '0 20px' }}
+                type="number"
+                label="Retry interval (in mins)"
+                value={retryInterval}
+                onChange={handleIntervalChange}
+                inputProps={{
+                  style: {
+                    height: '10px',
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Box sx={{ float: "right" }}>
-                <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={stepBack}
-
-                >
+              <Box sx={{ float: 'right' }}>
+                <Button variant="outlined" color="error" onClick={stepBack}>
                   Back
                 </Button>
 
                 <Button
                   variant="contained"
                   color="success"
-                  sx={{ margin: "0 20px" }}
+                  sx={{ margin: '0 20px' }}
                   onClick={stepNext}
                 >
                   Start the timer
@@ -156,7 +151,7 @@ const TimerQuery = () => {
         {activeStep === 3 && (
           <Grid container spacing={1}>
             <Grid item xs={12}>
-              <Box sx={{ margin: "20px" }}>
+              <Box sx={{ margin: '20px' }}>
                 {bookedSlot === undefined ? (
                   <></>
                 ) : (
@@ -165,11 +160,11 @@ const TimerQuery = () => {
               </Box>
             </Grid>
             <Grid item xs={12}>
-              <Box sx={{ float: "right" }}>
+              <Box sx={{ float: 'right' }}>
                 <Button
                   variant="contained"
                   color="success"
-                  sx={{ margin: "0 20px" }}
+                  sx={{ margin: '0 20px' }}
                   onClick={resetStepper}
                 >
                   Done

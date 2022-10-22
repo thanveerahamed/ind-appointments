@@ -37,7 +37,7 @@ const isFiltersValid = (filters?: Filters): boolean => {
   let currentFilters = filters;
 
   if (currentFilters === undefined) {
-    currentFilters = store.getState().filters;
+    currentFilters = store.getState().filters.criteria;
   }
 
   return !(

@@ -1,53 +1,52 @@
-import { Box, Grid } from "@mui/material";
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import Timeline from "@mui/lab/Timeline";
-import TimelineItem, { timelineItemClasses } from "@mui/lab/TimelineItem";
-import TimelineSeparator from "@mui/lab/TimelineSeparator";
-import TimelineConnector from "@mui/lab/TimelineConnector";
-import TimelineContent from "@mui/lab/TimelineContent";
-import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
-import TimelineDot from "@mui/lab/TimelineDot";
-import RepeatIcon from "@mui/icons-material/Repeat";
-import Typography from "@mui/material/Typography";
-import AlarmOnIcon from "@mui/icons-material/AlarmOn";
-import RepeatOneIcon from "@mui/icons-material/RepeatOne";
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
-import moment from "moment";
-import ErrorIcon from "@mui/icons-material/Error";
-import { RootState, useAppDispatch } from "../../../store/store";
+import { Box, Grid } from '@mui/material';
+import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem, { timelineItemClasses } from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import Typography from '@mui/material/Typography';
+import AlarmOnIcon from '@mui/icons-material/AlarmOn';
+import RepeatOneIcon from '@mui/icons-material/RepeatOne';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import moment from 'moment';
+import ErrorIcon from '@mui/icons-material/Error';
+import { RootState, useAppDispatch } from '../../../store/store';
 import {
   incrementStep,
   insertTimeLineItem,
   stopTimerAndReset,
   updateBookedSlot,
-} from "../../../store/reducers/timer";
+} from '../../../store/reducers/timer';
 import {
   ErrorList,
   SearchStatus,
   TimeLineItem,
   TimeLineType,
-} from "../../../types";
+} from '../../../types';
 import {
-  blockSelectedSlot,
   bookAppointment,
   getAvailableSlotsForTimerView,
-} from "../../../data";
-import { useSelector } from "react-redux";
-import HelpCenterIcon from "@mui/icons-material/HelpCenter";
-import { getTimeLineHeadingAndDescription } from "./helper";
-import { formatTimeLineDate } from "../../../helpers/date";
-import { resetSlots } from "../../../store/reducers/slots";
-import TopTimeLineElement from "./TopTimeLineElement";
-import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-import useIsMobile from "./useIsMobile";
-import {Dayjs} from "../../../types/dayjs";
+} from '../../../data';
+import { useSelector } from 'react-redux';
+import HelpCenterIcon from '@mui/icons-material/HelpCenter';
+import { getTimeLineHeadingAndDescription } from './helper';
+import { formatTimeLineDate } from '../../../helpers/date';
+import { resetSlots } from '../../../store/reducers/slots';
+import TopTimeLineElement from './TopTimeLineElement';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import useIsMobile from '../../common/hooks/useIsMobile';
+import { makeFilterQueryText } from '../../../helpers/filters';
 
 const TYPE_ICON_MAP = {
   [TimeLineType.START_TIMER]: (
     <TimelineSeparator>
-      <TimelineConnector sx={{ bgcolor: "success.main" }} />
+      <TimelineConnector sx={{ bgcolor: 'success.main' }} />
       <TimelineDot color="success">
         <AlarmOnIcon />
       </TimelineDot>
@@ -55,7 +54,7 @@ const TYPE_ICON_MAP = {
   ),
   [TimeLineType.NO_RECORDS]: (
     <TimelineSeparator>
-      <TimelineConnector sx={{ bgcolor: "secondary.main" }} />
+      <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
       <TimelineDot color="secondary" variant="outlined">
         <RepeatIcon />
       </TimelineDot>
@@ -64,7 +63,7 @@ const TYPE_ICON_MAP = {
   ),
   [TimeLineType.NO_RECORDS_WITH_CLOSEST]: (
     <TimelineSeparator>
-      <TimelineConnector sx={{ bgcolor: "primary.main" }} />
+      <TimelineConnector sx={{ bgcolor: 'primary.main' }} />
       <TimelineDot color="primary">
         <RepeatOneIcon />
       </TimelineDot>
@@ -73,7 +72,7 @@ const TYPE_ICON_MAP = {
   ),
   [TimeLineType.ERROR]: (
     <TimelineSeparator>
-      <TimelineConnector sx={{ bgcolor: "error.main" }} />
+      <TimelineConnector sx={{ bgcolor: 'error.main' }} />
       <TimelineDot color="error">
         <ErrorIcon />
       </TimelineDot>
@@ -82,7 +81,7 @@ const TYPE_ICON_MAP = {
   ),
   [TimeLineType.MANY_FAILURES]: (
     <TimelineSeparator>
-      <TimelineConnector sx={{ bgcolor: "error.main" }} />
+      <TimelineConnector sx={{ bgcolor: 'error.main' }} />
       <TimelineDot color="error">
         <ErrorIcon />
       </TimelineDot>
@@ -91,7 +90,7 @@ const TYPE_ICON_MAP = {
   ),
   [TimeLineType.UNKNOWN]: (
     <TimelineSeparator>
-      <TimelineConnector sx={{ bgcolor: "grey.main" }} />
+      <TimelineConnector sx={{ bgcolor: 'grey.main' }} />
       <TimelineDot color="grey">
         <HelpCenterIcon />
       </TimelineDot>
@@ -100,7 +99,7 @@ const TYPE_ICON_MAP = {
   ),
   [TimeLineType.SIMILAR_APT_EXISTS]: (
     <TimelineSeparator>
-      <TimelineConnector sx={{ bgcolor: "warning.main" }} />
+      <TimelineConnector sx={{ bgcolor: 'warning.main' }} />
       <TimelineDot color="warning">
         <ReportProblemIcon />
       </TimelineDot>
@@ -114,16 +113,16 @@ const TimerSearch = () => {
   const scrollDivRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useAppDispatch();
   const {
-    filters,
+    filters: { criteria: filters },
     timer: { timeline, retryInterval },
     bookingInformation: { contactInformation, peopleInformation },
   } = useSelector((state: RootState) => state);
   const [targetDate, setTargetDate] = useState<Date>(
-    moment(new Date()).add(retryInterval, "minutes").toDate()
+    moment(new Date()).add(retryInterval, 'minutes').toDate(),
   );
 
   const [searchStatus, setSearchStatus] = useState<SearchStatus>(
-    SearchStatus.UNKNOW
+    SearchStatus.UNKNOW,
   );
 
   const pushToTimeLine = (timeline: TimeLineItem) =>
@@ -149,9 +148,6 @@ const TimerSearch = () => {
       const querySlots = await getAvailableSlotsForTimerView(filters);
       if (querySlots.matchingSlot !== undefined) {
         setSearchStatus(SearchStatus.BOOKING);
-        await blockSelectedSlot({
-          slotWithId: querySlots.matchingSlot,
-        });
         const bookedSlot = await bookAppointment({
           slotWithId: querySlots.matchingSlot,
           persons: peopleInformation,
@@ -173,7 +169,7 @@ const TimerSearch = () => {
         type: timeLineType,
         ...getTimeLineHeadingAndDescription(
           timeLineType,
-          querySlots.closestSlot
+          querySlots.closestSlot,
         ),
         timestamp: new Date(),
       });
@@ -196,10 +192,10 @@ const TimerSearch = () => {
       });
     }
 
-    setTargetDate(moment(new Date()).add(retryInterval, "minutes").toDate());
+    setTargetDate(moment(new Date()).add(retryInterval, 'minutes').toDate());
     setSearchStatus(SearchStatus.WAIT);
-    if(scrollDivRef.current) {
-        scrollDivRef.current.scrollTop = 0
+    if (scrollDivRef.current) {
+      scrollDivRef.current.scrollTop = 0;
     }
   };
 
@@ -218,7 +214,7 @@ const TimerSearch = () => {
             type: TimeLineType.START_TIMER,
             ...getTimeLineHeadingAndDescription(TimeLineType.START_TIMER),
             timestamp: new Date(),
-          })
+          }),
         );
         await performSearch();
       }
@@ -230,60 +226,52 @@ const TimerSearch = () => {
 
   return (
     <>
-        <Grid container spacing={1}>
-            <Grid item xs={12}>
-                <Box
-                    sx={{
-                        marginLeft: { xs: '0', sm: '10%' },
-                        marginRight: { xs: '0', sm: '10%' },
-                    }}
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <Box
+            sx={{
+              marginLeft: { xs: '0', sm: '10%' },
+              marginRight: { xs: '0', sm: '10%' },
+            }}
+          >
+            <Alert
+              variant="outlined"
+              severity="warning"
+              action={
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={stopAndChangeInfo}
                 >
-                    <Alert
-                        variant="outlined"
-                        severity="warning"
-                        action={
-                            <Button
-                                color="inherit"
-                                size="small"
-                                onClick={stopAndChangeInfo}
-                            >
-                                Stop & change information
-                            </Button>
-                        }
-                    >
-                        Do not refresh the page, progress will be lost.
-                    </Alert>
-                </Box>
-            </Grid>
-            <Grid item xs={12}>
-                <Box
-                    sx={{
-                        marginLeft: { xs: '0', sm: '10%' },
-                        marginRight: { xs: '0', sm: '10%' },
-                    }}
-                >
-                    <Alert variant="outlined" severity="info">
-                        Searching {filters.appointmentType} for {filters.people} person(s)
-                        at {filters.locations.map((location) => location.name).join(',')}{' '}
-                        between{' '}
-                        {formatTimeLineDate(
-                            (filters.startDate as Dayjs).toDate(),
-                            'MMMM Do YYYY',
-                        )}{' '}
-                        and{' '}
-                        {formatTimeLineDate(
-                            (filters.endDate as Dayjs).toDate(),
-                            'MMMM Do YYYY',
-                        )}
-                    </Alert>
-                </Box>
-            </Grid>
+                  Stop & change information
+                </Button>
+              }
+            >
+              Do not refresh the page, progress will be lost.
+            </Alert>
+          </Box>
         </Grid>
-      <Box ref={scrollDivRef} sx={{ margin: "20px", overflow: "scroll", height: "70vh" }}>
+        <Grid item xs={12}>
+          <Box
+            sx={{
+              marginLeft: { xs: '0', sm: '10%' },
+              marginRight: { xs: '0', sm: '10%' },
+            }}
+          >
+            <Alert variant="outlined" severity="info">
+              {makeFilterQueryText(filters)}
+            </Alert>
+          </Box>
+        </Grid>
+      </Grid>
+      <Box
+        ref={scrollDivRef}
+        sx={{ margin: '20px', overflow: 'scroll', height: '70vh' }}
+      >
         <Grid container spacing={1}>
           <Grid item xs={12}>
             <Timeline
-              position={isMobile ? undefined : "alternate"}
+              position={isMobile ? undefined : 'alternate'}
               sx={
                 isMobile
                   ? {
@@ -302,31 +290,31 @@ const TimerSearch = () => {
               />
               {[...timeline]
                 .sort((a, b) =>
-                  a.timestamp.getTime() < b.timestamp.getTime() ? 1 : -1
+                  a.timestamp.getTime() < b.timestamp.getTime() ? 1 : -1,
                 )
                 .map((timeline, index) => {
                   return (
                     <TimelineItem key={index}>
                       {!isMobile && (
                         <TimelineOppositeContent
-                          sx={{ m: "auto 0" }}
+                          sx={{ m: 'auto 0' }}
                           align="right"
                           variant="body2"
                           color="text.secondary"
                         >
-                          {formatTimeLineDate(timeline.timestamp, "LLLL")}
+                          {formatTimeLineDate(timeline.timestamp, 'LLLL')}
                         </TimelineOppositeContent>
                       )}
 
                       {TYPE_ICON_MAP[timeline.type]}
-                      <TimelineContent sx={{ py: "12px", px: 2 }}>
+                      <TimelineContent sx={{ py: '12px', px: 2 }}>
                         <Typography variant="h6" component="span">
                           {timeline.heading}
                         </Typography>
                         <Typography>{timeline.description}</Typography>
                         {isMobile && (
                           <Typography variant="body2" color="text.secondary">
-                            {formatTimeLineDate(timeline.timestamp, "LLLL")}
+                            {formatTimeLineDate(timeline.timestamp, 'LLLL')}
                           </Typography>
                         )}
                       </TimelineContent>

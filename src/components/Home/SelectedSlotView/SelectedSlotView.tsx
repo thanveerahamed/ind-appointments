@@ -7,7 +7,7 @@ import { hasBookingInformation } from "../../../helpers/validators";
 import { useEffect, useState } from "react";
 import {slotSelected, updateBookedSlotResponse} from "../../../store/reducers/slots";
 import { showSnackbar } from "../../../store/reducers/alerts";
-import { blockSelectedSlot, bookAppointment } from "../../../data";
+import { bookAppointment } from "../../../data";
 import { SlotWithId } from "../../../types";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
@@ -21,16 +21,13 @@ const SelectedSlotView = () => {
     filters,
     bookingInformation: { contactInformation, peopleInformation },
   } = useSelector((state: RootState) => state);
-  const { appointmentType, people } = filters;
+  const { appointmentType, people } = filters.criteria;
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleBookSlot = async () => {
     if (hasBookingInformation()) {
       setLoading(true);
       try {
-        await blockSelectedSlot({
-          slotWithId: selectedSlot as SlotWithId,
-        });
         const bookedAppointment = await bookAppointment({
           slotWithId: selectedSlot as SlotWithId,
           contactInformation: contactInformation,
