@@ -2,8 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BookAppointmentResponse, TimeLineItem } from '../../types';
 
 // minutes
-const minTimer = 25;
+const minTimer = 5;
 const maxTimer = 45;
+const defaultTimer = 25;
 
 const initialState: {
   activeStep: number;
@@ -12,7 +13,7 @@ const initialState: {
   bookedSlot?: BookAppointmentResponse;
 } = {
   activeStep: 0,
-  retryInterval: minTimer,
+  retryInterval: defaultTimer,
   timeline: [],
   bookedSlot: undefined,
 };
