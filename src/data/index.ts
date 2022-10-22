@@ -156,6 +156,10 @@ export const bookAppointment = async ({
   persons: Person[];
   appointmentType: string;
 }): Promise<BookAppointmentResponse> => {
+  await blockSelectedSlot({
+    slotWithId,
+  });
+
   const payload = makeBookAppointmentRequest(
     slotWithId,
     persons,

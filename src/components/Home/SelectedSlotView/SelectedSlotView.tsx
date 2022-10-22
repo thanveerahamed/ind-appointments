@@ -7,7 +7,7 @@ import { hasBookingInformation } from "../../../helpers/validators";
 import { useEffect, useState } from "react";
 import {slotSelected, updateBookedSlotResponse} from "../../../store/reducers/slots";
 import { showSnackbar } from "../../../store/reducers/alerts";
-import { blockSelectedSlot, bookAppointment } from "../../../data";
+import { bookAppointment } from "../../../data";
 import { SlotWithId } from "../../../types";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
@@ -28,9 +28,6 @@ const SelectedSlotView = () => {
     if (hasBookingInformation()) {
       setLoading(true);
       try {
-        await blockSelectedSlot({
-          slotWithId: selectedSlot as SlotWithId,
-        });
         const bookedAppointment = await bookAppointment({
           slotWithId: selectedSlot as SlotWithId,
           contactInformation: contactInformation,

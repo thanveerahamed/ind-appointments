@@ -11,14 +11,21 @@ import NoRecords from './NoRecords';
 import { SlotWithId } from '../../../../types';
 import { sortSlotsAscending } from '../../../../helpers/slots';
 import AppointmentsView from './AppointmentsView';
-import Toolbar from '@mui/material/Toolbar';
+import AppointmentDetails from './AppointmentDetails';
 
 const ManualQueryMobileView = () => {
   const [openFilterDialog, setOpenFilterDialog] = React.useState(false);
+  const [openBookingInformation, setOpenBookingInformation] =
+    React.useState(false);
+
   const {
     filters: { criteria: filters, loading: filtersLoading },
     slots: { loading: slotsLoading, availableSlots },
   } = useSelector((state: RootState) => state);
+
+  const handleAppointmentBook = () => {
+    setOpenBookingInformation(true);
+  };
 
   const data = availableSlots
     .reduce((accumulator: SlotWithId[], availableSlotsWithLocation) => {
@@ -47,10 +54,18 @@ const ManualQueryMobileView = () => {
           {data.length === 0 ? (
             <NoRecords onChangeFilter={() => setOpenFilterDialog(true)} />
           ) : (
-            <AppointmentsView appointments={data} />
+            <AppointmentsView
+              appointments={data}
+              onBookAppointment={handleAppointmentBook}
+            />
           )}
         </>
       )}
+
+      <AppointmentDetails
+        showBookingInformationDialog={openBookingInformation}
+        closeBookingInformationDialog={() => setOpenBookingInformation(false)}
+      />
 
       <FilterDialog
         open={openFilterDialog}

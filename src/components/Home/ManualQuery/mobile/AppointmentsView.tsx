@@ -8,11 +8,14 @@ import Button from '@mui/material/Button';
 import { useState } from 'react';
 import { useScrollAppointments } from './useScroll';
 import { LoadingButton } from '@mui/lab';
+import { slotSelected } from '../../../../store/reducers/slots';
+import {useAppDispatch } from '../../../../store/store';
 
 const PAGE_SIZE = 5;
 
 interface Props {
   appointments: SlotWithId[];
+  onBookAppointment: () => void;
 }
 
 const lineItemStyle = {
@@ -22,17 +25,28 @@ const lineItemStyle = {
   marginBottom: '10px',
 };
 
-const AppointmentsView = ({ appointments }: Props) => {
+const AppointmentsView = ({ appointments, onBookAppointment }: Props) => {
+  const dispatch = useAppDispatch();
+
   const [pageCount, setPageCount] = useState<number>(PAGE_SIZE);
   const { currentPageAppointments, isLoading, hasMore } = useScrollAppointments(
     { pageCount, appointments },
   );
 
+  const handleOnBook = (appointment: SlotWithId) => {
+    dispatch(slotSelected(appointment));
+    onBookAppointment();
+  };
+
   return (
     <Box sx={{ overflowY: 'scroll', height: '70vh' }}>
       {currentPageAppointments.map((appointment) => {
         return (
-          <Paper variant="outlined" sx={{ marginTop: '10px' }}>
+          <Paper
+            key={appointment.id}
+            variant="outlined"
+            sx={{ marginTop: '10px' }}
+          >
             <Box sx={{ padding: '10px', wordWrap: 'break-word' }}>
               <Grid container>
                 <Grid item xs={12}>
@@ -54,7 +68,11 @@ const AppointmentsView = ({ appointments }: Props) => {
                   </Box>
                 </Grid>
                 <Grid item xs={3}>
-                  <Button variant="contained" color="success">
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => handleOnBook(appointment)}
+                  >
                     Book
                   </Button>
                 </Grid>

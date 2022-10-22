@@ -30,7 +30,6 @@ import {
   TimeLineType,
 } from '../../../types';
 import {
-  blockSelectedSlot,
   bookAppointment,
   getAvailableSlotsForTimerView,
 } from '../../../data';
@@ -149,9 +148,6 @@ const TimerSearch = () => {
       const querySlots = await getAvailableSlotsForTimerView(filters);
       if (querySlots.matchingSlot !== undefined) {
         setSearchStatus(SearchStatus.BOOKING);
-        await blockSelectedSlot({
-          slotWithId: querySlots.matchingSlot,
-        });
         const bookedSlot = await bookAppointment({
           slotWithId: querySlots.matchingSlot,
           persons: peopleInformation,
