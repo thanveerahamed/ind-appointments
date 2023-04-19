@@ -12,10 +12,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: npm ci && npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount:
             '${{ secrets.FIREBASE_SERVICE_ACCOUNT_IND_APPOINTMENTS }}'
           channelId: live
           projectId: ind-appointments
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_REACT_APP_FIREBASE_API_KEY:
+            '${{ secrets.REACT_APP_FIREBASE_API_KEY }}'
+          envkey_REACT_APP_FIREBASE_MESSAGING_ID:
+            '${{ secrets.REACT_APP_FIREBASE_MESSAGING_ID }}'
+          envkey_REACT_APP_FIREBASE_APP_ID:
+            '${{ secrets.REACT_APP_FIREBASE_APP_ID }}'
+          envkey_REACT_APP_FIREBASE_MEASUREMENT_ID:
+            '${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}'
+          file_name: .env
+          fail_on_empty: false
