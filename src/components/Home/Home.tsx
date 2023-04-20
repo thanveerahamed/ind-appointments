@@ -4,7 +4,10 @@ import Box from '@mui/material/Box';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import Fade from '@mui/material/Fade';
 import ManualQuery from './ManualQuery/ManualQuery';
-import {changeLocations, setLoading as setFilterLoading} from '../../store/reducers/filters';
+import {
+  changeLocations,
+  setLoading as setFilterLoading,
+} from '../../store/reducers/filters';
 import { updatePeopleInformationOnNumberOfPeopleChange } from '../../store/reducers/bookingInformation';
 import { RootState, useAppDispatch } from '../../store/store';
 import { useSelector } from 'react-redux';
@@ -23,6 +26,7 @@ import ErrorBoundaryContent from '../../App/App/ErrorBoundaryContent';
 import { isFiltersValid } from '../../helpers/validators';
 import { showSnackbar } from '../../store/reducers/alerts';
 import { AvailableSlotsWithLocation } from '../../types';
+import { useAnalyticsEventTracker } from '../../hooks/useAnalyticsEventTracker';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -59,6 +63,7 @@ const a11yProps = (index: number) => {
 
 const Home = () => {
   const dispatch = useAppDispatch();
+  const trackEvent = useAnalyticsEventTracker('Home');
   const {
     filters: { criteria: filters },
     timer: { activeStep },
@@ -114,6 +119,7 @@ const Home = () => {
       const desks = await getDesks();
       dispatch(updateDesks(desks));
       dispatch(setFilterLoading(false));
+      trackEvent('load_desks', 'Loading of desks complete');
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.appointmentType]);

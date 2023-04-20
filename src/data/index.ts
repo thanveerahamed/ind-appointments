@@ -23,17 +23,19 @@ enum PostAction {
   RESERVE_SLOT = 'reserveSlot',
 }
 
-const localEndpointMap = {
-  [PostAction.GET_DESKS]: 'http://localhost:8003/ind-service',
-  [PostAction.GET_SLOTS]: 'http://localhost:8000/ind-service',
-  [PostAction.BLOCK_SLOT]: 'http://localhost:8002/ind-service',
-  [PostAction.RESERVE_SLOT]: 'http://localhost:8001/ind-service',
-};
+// const localEndpointMap = {
+//   [PostAction.GET_DESKS]: 'http://localhost:8003/ind-service',
+//   [PostAction.GET_SLOTS]: 'http://localhost:8000/ind-service',
+//   [PostAction.BLOCK_SLOT]: 'http://localhost:8002/ind-service',
+//   [PostAction.RESERVE_SLOT]: 'http://localhost:8001/ind-service',
+// };
 
 const getServerUrl = (action: PostAction) => {
-  return process.env.NODE_ENV === 'development'
-    ? localEndpointMap[action]
-    : url;
+  // return process.env.NODE_ENV === 'development'
+  //   ? localEndpointMap[action]
+  //   : url;
+
+  return url;
 };
 
 const handleError = async (response: Response) => {
