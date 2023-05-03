@@ -3,7 +3,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { ColorLibConnector, ColorLibStepIcon } from './ColorLib';
-import { ChangeEvent, useState } from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 import FilterSection from '../../common/FilterSection/FilterSection';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../store/store';
@@ -20,9 +20,12 @@ import BookingInformationView from '../BookingInformation/BookingInformationView
 import TimerSearch from '../TimerSearch/TimerSearch';
 import BookedAppointmentView from '../BookedAppointmentView/BookedAppointmentView';
 import { resetSlots } from '../../../store/reducers/slots';
+import ReactGA from "react-ga";
+import {useAnalyticsEventTracker} from "../../../hooks/useAnalyticsEventTracker";
 
 const TimerQuery = () => {
   const dispatch = useAppDispatch();
+  const trackEvent = useAnalyticsEventTracker('Stepper');
   const {
     filters,
     timer: { activeStep, retryInterval, bookedSlot },
@@ -47,17 +50,26 @@ const TimerQuery = () => {
 
     if (canMoveNext) {
       dispatch(incrementStep());
+      trackEvent('move_next', activeStep.toString())
     }
   };
   const stepBack = () => dispatch(decrementStep());
   const handleIntervalChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => dispatch(updateInterval(parseInt(event.target.value, 10)));
+  ) => {
+    dispatch(updateInterval(parseInt(event.target.value, 10)))
+    trackEvent('retry_interval_change', event.target.value)
+  };
 
   const resetStepper = () => {
     dispatch(stopTimerAndReset());
     dispatch(resetSlots());
+    trackEvent('reset_stepper', '')
   };
+
+  useEffect(() => {
+    ReactGA.pageview("scheduler");
+  }, []);
 
   return (
     <Paper sx={{ padding: '20px 0' }}>

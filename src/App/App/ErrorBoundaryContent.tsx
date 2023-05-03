@@ -1,13 +1,19 @@
 import { Box, Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { LoadingButton } from '@mui/lab';
 import Lottie from 'lottie-react';
 import errorAnimation from '../../assets/lottie/errorMessage.json';
 import loadingAnimation from '../../assets/lottie/loading.json';
+import ReactGA from "react-ga";
 
 const ErrorBoundaryContent = () => {
   const [loading, setLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        ReactGA.pageview('error-screen');
+    }, []);
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>

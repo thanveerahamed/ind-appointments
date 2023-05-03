@@ -22,9 +22,11 @@ import { RootState, useAppDispatch } from '../../../store/store';
 import { useSelector } from 'react-redux';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
+import { useAnalyticsEventTracker } from '../../../hooks/useAnalyticsEventTracker';
 
 const FilterForm = () => {
   const dispatch = useAppDispatch();
+  const trackEvent = useAnalyticsEventTracker('Filters');
   const { availableDesks: desks } = useSelector(
     (state: RootState) => state.desks,
   );
@@ -34,14 +36,17 @@ const FilterForm = () => {
 
   const handleAppointmentTypeChange = (event: SelectChangeEvent) => {
     dispatch(changeAppointmentType(event.target.value));
+    trackEvent('appointment_type_change', event.target.value);
   };
 
   const handleDeskChange = (newValue: Desk[]) => {
     dispatch(changeLocations(newValue));
+    trackEvent('desk_change', newValue.join(','));
   };
 
   const handlePeopleChange = (event: SelectChangeEvent) => {
     dispatch(changeNumberOfPeople(event.target.value));
+    trackEvent('number_of_people_change', event.target.value);
   };
 
   const handleDateChange = (
@@ -49,6 +54,7 @@ const FilterForm = () => {
     date: Dayjs | null,
   ) => {
     dispatch(changeDates({ key, value: date }));
+    trackEvent(`${key}_change`, date?.toISOString() ?? '');
   };
 
   return (
