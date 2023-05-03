@@ -1,16 +1,21 @@
 import FilterSection from '../../../common/FilterSection/FilterSection';
 import * as React from 'react';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import SlotsDisplay from '../../SlotsDisplay/SlotsDisplay';
 import { Grid } from '@mui/material';
 import BookingInformationDialog from '../../BookingInformation/BookingInformationDialog';
 import InformationDisplay from '../../InformationDisplay/InformationDisplay';
 import SelectedSlotView from '../../SelectedSlotView/SelectedSlotView';
 import BookedAppointmentDialog from '../../BookedAppointmentView/BookedAppointmentDialog';
+import ReactGA from "react-ga";
 
 const ManualQueryWebView = () => {
   const [showBookingInformationScreen, setShowBookingInformationScreen] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    ReactGA.pageview("manual-query/web");
+  }, []);
 
   return (
     <>

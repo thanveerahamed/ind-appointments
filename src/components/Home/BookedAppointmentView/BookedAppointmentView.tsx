@@ -3,12 +3,18 @@ import Typography from '@mui/material/Typography';
 import { BookAppointmentResponse } from '../../../types';
 import Lottie from 'lottie-react';
 import confetti from '../../../assets/lottie/confetti.json';
+import { useEffect } from 'react';
+import ReactGA from 'react-ga';
 
 interface Props {
   bookedSlotResponse: BookAppointmentResponse;
 }
 
 const BookedAppointmentView = ({ bookedSlotResponse }: Props) => {
+  useEffect(() => {
+    ReactGA.pageview('booking-success');
+  }, []);
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} sm={6}>

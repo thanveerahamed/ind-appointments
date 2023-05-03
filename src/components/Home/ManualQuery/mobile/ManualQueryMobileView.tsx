@@ -12,6 +12,8 @@ import { SlotWithId } from '../../../../types';
 import { sortSlotsAscending } from '../../../../helpers/slots';
 import AppointmentsView from './AppointmentsView';
 import AppointmentDetails from './AppointmentDetails';
+import {useEffect} from "react";
+import ReactGA from "react-ga";
 
 const ManualQueryMobileView = () => {
   const [openFilterDialog, setOpenFilterDialog] = React.useState(false);
@@ -41,6 +43,10 @@ const ManualQueryMobileView = () => {
       return [...accumulator, ...slots];
     }, [])
     .sort(sortSlotsAscending);
+
+    useEffect(() => {
+        ReactGA.pageview("manual-query/mobile");
+    }, []);
 
   return (
     <Box sx={{ margin: '5px' }}>
