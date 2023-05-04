@@ -15,6 +15,14 @@ export const APPOINTMENT_TYPES: ValueLabelPair[] = [
     value: 'DOC',
     label: 'Document collection',
   },
+  {
+    value: 'VAA',
+    label: 'Endorsement sticker',
+  },
+  {
+    value: 'TKV',
+    label: 'Return visa',
+  },
 ];
 
 // eslint-disable-next-line no-useless-escape
