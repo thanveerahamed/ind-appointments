@@ -31,6 +31,7 @@ const ErrorBoundaryContent = ({ error, errorInfo }: Props) => {
       amplitude.logEvent(eventName, eventProperties);
       amplitude.track(eventName, eventProperties);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
