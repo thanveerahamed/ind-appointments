@@ -7,6 +7,8 @@ interface Props {
 
 interface State {
     hasError: boolean;
+    error?: Error;
+    errorInfo?: ErrorInfo;
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -14,18 +16,23 @@ class ErrorBoundary extends Component<Props, State> {
         hasError: false
     };
 
-    public static getDerivedStateFromError(_: Error): State {
+    public static getDerivedStateFromError(error: Error): State {
         // Update state so the next render will show the fallback UI.
-        return { hasError: true };
+        return { hasError: true, error };
     }
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error("Uncaught error:", error, errorInfo);
+
+        this.setState({
+            error,
+            errorInfo
+        })
     }
 
     public render() {
         if (this.state.hasError) {
-            return <ErrorBoundaryContent/>;
+            return <ErrorBoundaryContent error={this.state.error} errorInfo={this.state.errorInfo}/>;
         }
 
         return this.props.children;

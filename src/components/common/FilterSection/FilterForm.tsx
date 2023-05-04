@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
 import { useAnalyticsEventTracker } from '../../../hooks/useAnalyticsEventTracker';
+import * as amplitude from '@amplitude/analytics-browser';
 
 const FilterForm = () => {
   const dispatch = useAppDispatch();
@@ -37,11 +38,25 @@ const FilterForm = () => {
   const handleAppointmentTypeChange = (event: SelectChangeEvent) => {
     dispatch(changeAppointmentType(event.target.value));
     trackEvent('appointment_type_change', event.target.value);
+
+    const eventName = 'Appointment type changed';
+    const eventProperties = {
+      type: event.target.value,
+    };
+    amplitude.logEvent(eventName, eventProperties);
+    amplitude.track(eventName, eventProperties);
   };
 
   const handleDeskChange = (newValue: Desk[]) => {
     dispatch(changeLocations(newValue));
     trackEvent('desk_change', newValue.join(','));
+
+    const eventName = 'Desk changed';
+    const eventProperties = {
+      desks: newValue,
+    };
+    amplitude.logEvent(eventName, eventProperties);
+    amplitude.track(eventName, eventProperties);
   };
 
   const handlePeopleChange = (event: SelectChangeEvent) => {
@@ -55,6 +70,14 @@ const FilterForm = () => {
   ) => {
     dispatch(changeDates({ key, value: date }));
     trackEvent(`${key}_change`, date?.toISOString() ?? '');
+
+    const eventName = 'Date changed';
+    const eventProperties = {
+      type: key,
+      date: date?.toISOString(),
+    };
+    amplitude.logEvent(eventName, eventProperties);
+    amplitude.track(eventName, eventProperties);
   };
 
   return (
