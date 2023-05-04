@@ -1,18 +1,37 @@
 import { Box, Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import {useEffect, useState} from 'react';
+import { ErrorInfo, useEffect, useState } from 'react';
 import { LoadingButton } from '@mui/lab';
 import Lottie from 'lottie-react';
 import errorAnimation from '../../assets/lottie/errorMessage.json';
 import loadingAnimation from '../../assets/lottie/loading.json';
-import ReactGA from "react-ga";
+import ReactGA from 'react-ga';
+import * as amplitude from '@amplitude/analytics-browser';
+import { useAnalyticsExceptionTracker } from '../../hooks/useAnalyticsExceptionTracker';
 
-const ErrorBoundaryContent = () => {
+interface Props {
+  error?: Error;
+  errorInfo?: ErrorInfo;
+}
+
+const ErrorBoundaryContent = ({ error, errorInfo }: Props) => {
+  const trackException = useAnalyticsExceptionTracker();
   const [loading, setLoading] = useState<boolean>(false);
 
-    useEffect(() => {
-        ReactGA.pageview('error-screen');
-    }, []);
+  useEffect(() => {
+    ReactGA.pageview('error-screen');
+    if (error !== undefined || errorInfo !== undefined) {
+      trackException(error?.message ?? 'Unknown error');
+
+      const eventName = 'Appointment type changed';
+      const eventProperties = {
+        error,
+        errorInfo,
+      };
+      amplitude.logEvent(eventName, eventProperties);
+      amplitude.track(eventName, eventProperties);
+    }
+  }, []);
 
   return (
     <Grid container spacing={2}>
@@ -45,9 +64,7 @@ const ErrorBoundaryContent = () => {
                   marginRight: 'auto',
                 }}
               />
-              <Typography variant="h4">
-                Oh crap!!! IND hates you! 😅
-              </Typography>
+              <Typography variant="h4">Oh crap!!! IND hates you! 😅</Typography>
               <LoadingButton
                 sx={{ marginTop: '10px' }}
                 variant="contained"

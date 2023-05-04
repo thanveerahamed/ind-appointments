@@ -5,7 +5,6 @@
 This message is for folks who are trying to get the best appointment slots for
 their Biometric or Doc collection.
 
-https://ind-api.000webhostapp.com/ \
 https://ind-appointments.web.app/
 
 I had this difficulty when I was looking for appointments for the same. Finding
