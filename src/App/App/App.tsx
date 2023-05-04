@@ -7,7 +7,7 @@ import store from '../../store/store';
 import { Provider } from 'react-redux';
 import ErrorBoundary from './ErrorBoundary';
 import ReactGA from 'react-ga';
-import '../../components/common/analytics'
+import '../../analytics'
 
 const TRACKING_ID = 'UA-264554107-1';
 ReactGA.initialize(TRACKING_ID);
