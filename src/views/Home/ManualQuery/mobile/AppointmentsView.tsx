@@ -39,7 +39,7 @@ const AppointmentsView = ({ appointments, onBookAppointment }: Props) => {
   };
 
   return (
-    <Box sx={{ overflowY: 'scroll', height: '70vh' }}>
+    <Box>
       {currentPageAppointments.map((appointment) => {
         return (
           <Paper
