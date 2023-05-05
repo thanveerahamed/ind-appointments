@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Fab } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Typography from '@mui/material/Typography';
 import { useSelector } from 'react-redux';
@@ -12,8 +12,8 @@ import { SlotWithId } from '../../../../types';
 import { sortSlotsAscending } from '../../../../helpers/slots';
 import AppointmentsView from './AppointmentsView';
 import AppointmentDetails from './AppointmentDetails';
-import {useEffect} from "react";
-import ReactGA from "react-ga";
+import { useEffect } from 'react';
+import ReactGA from 'react-ga';
 
 const ManualQueryMobileView = () => {
   const [openFilterDialog, setOpenFilterDialog] = React.useState(false);
@@ -44,9 +44,9 @@ const ManualQueryMobileView = () => {
     }, [])
     .sort(sortSlotsAscending);
 
-    useEffect(() => {
-        ReactGA.pageview("manual-query/mobile");
-    }, []);
+  useEffect(() => {
+    ReactGA.pageview('manual-query/mobile');
+  }, []);
 
   return (
     <Box sx={{ margin: '5px' }}>
@@ -54,9 +54,18 @@ const ManualQueryMobileView = () => {
         <MobileLoading />
       ) : (
         <>
-          <Typography variant="body1">
-            {makeFilterQueryText(filters)}
-          </Typography>
+          <Box sx={{ display: 'flex' }}>
+            <Typography variant="subtitle2">
+              {makeFilterQueryText(filters)}
+            </Typography>
+            <IconButton
+              color="primary"
+              aria-label="filter"
+              onClick={() => setOpenFilterDialog(true)}
+            >
+              <FilterAltIcon />
+            </IconButton>
+          </Box>
           {data.length === 0 ? (
             <NoRecords onChangeFilter={() => setOpenFilterDialog(true)} />
           ) : (
@@ -77,18 +86,6 @@ const ManualQueryMobileView = () => {
         open={openFilterDialog}
         handleClose={() => setOpenFilterDialog(false)}
       />
-      <Fab
-        sx={{
-          position: 'absolute',
-          bottom: 16,
-          right: 16,
-        }}
-        color="primary"
-        aria-label="filter"
-        onClick={() => setOpenFilterDialog(true)}
-      >
-        <FilterAltIcon />
-      </Fab>
     </Box>
   );
 };

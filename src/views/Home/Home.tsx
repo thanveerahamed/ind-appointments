@@ -18,7 +18,7 @@ import {
   updateAvailableSlotsWithLocationToEmpty,
   setLoading as setGridLoading,
 } from '../../store/reducers/slots';
-import SnackBarAlert from '../common/SnackBarAlert/SnackBarAlert';
+import SnackBarAlert from '../../components/common/SnackBarAlert/SnackBarAlert';
 import TimerQuery from './TimeQuery/TimerQuery';
 import StopTimeConfirmationDialog from './TimeQuery/StopTimeConfirmationDialog';
 import { stopTimerAndReset } from '../../store/reducers/timer';
@@ -27,7 +27,6 @@ import { isFiltersValid } from '../../helpers/validators';
 import { showSnackbar } from '../../store/reducers/alerts';
 import { AvailableSlotsWithLocation } from '../../types';
 import { useAnalyticsEventTracker } from '../../hooks/useAnalyticsEventTracker';
-import * as amplitude from '@amplitude/analytics-browser';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -121,7 +120,6 @@ const Home = () => {
       dispatch(updateDesks(desks));
       dispatch(setFilterLoading(false));
       trackEvent('load_desks', 'Loading of desks complete');
-      amplitude.logEvent("Desks Loaded")
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.appointmentType]);

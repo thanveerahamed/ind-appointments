@@ -40,7 +40,7 @@ import { formatTimeLineDate } from '../../../helpers/date';
 import { resetSlots } from '../../../store/reducers/slots';
 import TopTimeLineElement from './TopTimeLineElement';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import useIsMobile from '../../common/hooks/useIsMobile';
+import useIsMobile from '../../../components/common/hooks/useIsMobile';
 import { makeFilterQueryText } from '../../../helpers/filters';
 
 const TYPE_ICON_MAP = {
