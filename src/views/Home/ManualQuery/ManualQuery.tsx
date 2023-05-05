@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import useIsMobile from '../../common/hooks/useIsMobile';
+import useIsMobile from '../../../components/common/hooks/useIsMobile';
 import ManualQueryMobileView from './mobile/ManualQueryMobileView';
 import ManualQueryWebView from './web/ManualQueryWebView';
 

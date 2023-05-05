@@ -6,7 +6,6 @@ import Lottie from 'lottie-react';
 import errorAnimation from '../../assets/lottie/errorMessage.json';
 import loadingAnimation from '../../assets/lottie/loading.json';
 import ReactGA from 'react-ga';
-import * as amplitude from '@amplitude/analytics-browser';
 import { useAnalyticsExceptionTracker } from '../../hooks/useAnalyticsExceptionTracker';
 
 interface Props {
@@ -22,14 +21,6 @@ const ErrorBoundaryContent = ({ error, errorInfo }: Props) => {
     ReactGA.pageview('error-screen');
     if (error !== undefined || errorInfo !== undefined) {
       trackException(error?.message ?? 'Unknown error');
-
-      const eventName = 'Appointment type changed';
-      const eventProperties = {
-        error,
-        errorInfo,
-      };
-      amplitude.logEvent(eventName, eventProperties);
-      amplitude.track(eventName, eventProperties);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -1,4 +1,4 @@
-import FilterSection from '../../../common/FilterSection/FilterSection';
+import FilterSection from '../../../../components/common/FilterSection/FilterSection';
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import SlotsDisplay from '../../SlotsDisplay/SlotsDisplay';

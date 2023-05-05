@@ -4,9 +4,9 @@ import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import SlideTransition from '../../../common/transition/Slide';
+import SlideTransition from '../../../../components/common/transition/Slide';
 import { Box } from '@mui/material';
-import FilterForm from '../../../common/FilterSection/FilterForm';
+import FilterForm from '../../../../components/common/FilterSection/FilterForm';
 
 interface Props {
   open: boolean;

@@ -4,7 +4,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { ColorLibConnector, ColorLibStepIcon } from './ColorLib';
 import {ChangeEvent, useEffect, useState} from 'react';
-import FilterSection from '../../common/FilterSection/FilterSection';
+import FilterSection from '../../../components/common/FilterSection/FilterSection';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../store/store';
 import {

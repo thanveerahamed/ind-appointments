@@ -1,5 +1,5 @@
 import Dialog from '@mui/material/Dialog';
-import SlideTransition from '../../../common/transition/Slide';
+import SlideTransition from '../../../../components/common/transition/Slide';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
