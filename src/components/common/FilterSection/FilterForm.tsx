@@ -41,7 +41,7 @@ const FilterForm = () => {
 
   const handleDeskChange = (newValue: Desk[]) => {
     dispatch(changeLocations(newValue));
-    trackEvent('desk_change', newValue.join(','));
+    trackEvent('desk_change', newValue.map(value => value.key).join(','));
   };
 
   const handlePeopleChange = (event: SelectChangeEvent) => {
