@@ -13,8 +13,9 @@ import { dayjs } from '../types/dayjs';
 import { Dayjs } from 'dayjs';
 import { makeBookAppointmentRequest } from '../helpers/request';
 import { sortSlotsAscending } from '../helpers/slots';
+import axios, { AxiosResponse } from 'axios';
 
-const url = 'https://ind-api.000webhostapp.com/ind-service/index.php';
+const url: string = 'https://ind-appointments.ey.r.appspot.com/ind-api/rest';
 
 enum PostAction {
   GET_DESKS = 'getDesks',
@@ -23,23 +24,11 @@ enum PostAction {
   RESERVE_SLOT = 'reserveSlot',
 }
 
-// const localEndpointMap = {
-//   [PostAction.GET_DESKS]: 'http://localhost:8003/ind-service',
-//   [PostAction.GET_SLOTS]: 'http://localhost:8000/ind-service',
-//   [PostAction.BLOCK_SLOT]: 'http://localhost:8002/ind-service',
-//   [PostAction.RESERVE_SLOT]: 'http://localhost:8001/ind-service',
-// };
-
-const getServerUrl = (action: PostAction) => {
-  // return process.env.NODE_ENV === 'development'
-  //   ? localEndpointMap[action]
-  //   : url;
-
+const getServerUrl = () => {
   return url;
 };
 
-const handleError = async (response: Response) => {
-  const errorResponse = await response.json();
+const handleError = async (errorResponse: AxiosResponse) => {
   if (errorResponse.data !== undefined) {
     throw new Error(errorResponse.data);
   } else {
@@ -47,25 +36,37 @@ const handleError = async (response: Response) => {
   }
 };
 
+const fetchAxios = async <T>({
+  data,
+  action,
+}: {
+  data: unknown;
+  action: PostAction;
+}) => {
+  return await axios
+    .post(getServerUrl(), {
+      action,
+      data,
+    })
+    .then(async (response) => {
+      if (response.status !== 200) {
+        await handleError(response);
+      }
+
+      return response.data as T;
+    });
+};
+
 export const getAvailableDesks = async ({
   appointmentType,
 }: {
   appointmentType: string;
 }): Promise<Desk[]> => {
-  return await fetch(getServerUrl(PostAction.GET_DESKS), {
-    method: 'post',
-    body: JSON.stringify({
-      action: PostAction.GET_DESKS,
-      data: {
-        productType: appointmentType,
-      },
-    }),
-  }).then(async (response) => {
-    if (response.status !== 200) {
-      await handleError(response);
-    }
-
-    return (await response.json()).data;
+  return await fetchAxios<Desk[]>({
+    action: PostAction.GET_DESKS,
+    data: {
+      productType: appointmentType,
+    },
   });
 };
 
@@ -78,22 +79,13 @@ export const getAvailableSlots = async ({
   appointmentType: string;
   people: string;
 }): Promise<Slot[]> => {
-  return await fetch(getServerUrl(PostAction.GET_SLOTS), {
-    method: 'post',
-    body: JSON.stringify({
-      action: PostAction.GET_SLOTS,
-      data: {
-        desk: location,
-        productType: appointmentType,
-        persons: people,
-      },
-    }),
-  }).then(async (response) => {
-    if (response.status !== 200) {
-      await handleError(response);
-    }
-
-    return (await response.json()).data;
+  return await fetchAxios<Slot[]>({
+    action: PostAction.GET_SLOTS,
+    data: {
+      desk: location,
+      productType: appointmentType,
+      persons: people,
+    },
   });
 };
 
@@ -102,16 +94,15 @@ export const getAvailableSlotsWithDesk = async (
 ): Promise<AvailableSlotsWithLocation[]> => {
   const promises = filters.locations.map(
     async (location): Promise<AvailableSlotsWithLocation> => {
+      const result = await getAvailableSlots({
+        location: location.key,
+        appointmentType: filters.appointmentType,
+        people: filters.people,
+      });
       return {
         deskKey: location.key,
         deskName: location.name,
-        slots: (
-          await getAvailableSlots({
-            location: location.key,
-            appointmentType: filters.appointmentType,
-            people: filters.people,
-          })
-        ).filter((slot): boolean =>
+        slots: result.filter((slot): boolean =>
           dayjs(slot.date, 'YYYY-MM-DD').isBetween(
             (filters.startDate as Dayjs).format('YYYY-MM-DD'),
             (filters.endDate as Dayjs).format('YYYY-MM-DD'),
@@ -126,24 +117,18 @@ export const getAvailableSlotsWithDesk = async (
 
 export const blockSelectedSlot = async ({
   slotWithId,
+  appointmentType,
 }: {
   slotWithId: SlotWithId;
-}): Promise<Slot[]> => {
-  return await fetch(getServerUrl(PostAction.BLOCK_SLOT), {
-    method: 'post',
-    body: JSON.stringify({
-      action: PostAction.BLOCK_SLOT,
-      data: {
-        desk: slotWithId.deskKey,
-        payload: slotWithId as Slot,
-      },
-    }),
-  }).then(async (response) => {
-    if (response.status !== 200) {
-      await handleError(response);
-    }
-
-    return (await response.json()).data;
+  appointmentType: string;
+}): Promise<Slot> => {
+  return await fetchAxios<Slot>({
+    action: PostAction.BLOCK_SLOT,
+    data: {
+      desk: slotWithId.deskKey,
+      productType: appointmentType,
+      payload: slotWithId as Slot,
+    },
   });
 };
 
@@ -160,6 +145,7 @@ export const bookAppointment = async ({
 }): Promise<BookAppointmentResponse> => {
   await blockSelectedSlot({
     slotWithId,
+    appointmentType,
   });
 
   const payload = makeBookAppointmentRequest(
@@ -168,21 +154,13 @@ export const bookAppointment = async ({
     contactInformation,
     appointmentType,
   );
-  return fetch(getServerUrl(PostAction.RESERVE_SLOT), {
-    method: 'post',
-    body: JSON.stringify({
-      action: PostAction.RESERVE_SLOT,
-      data: {
-        desk: slotWithId.deskKey,
-        payload,
-      },
-    }),
-  }).then(async (response) => {
-    if (response.status !== 200) {
-      await handleError(response);
-    }
-
-    return (await response.json()).data;
+  return await fetchAxios<BookAppointmentResponse>({
+    action: PostAction.RESERVE_SLOT,
+    data: {
+      desk: slotWithId.deskKey,
+      productType: appointmentType,
+      payload,
+    },
   });
 };
 
